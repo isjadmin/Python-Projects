@@ -1,0 +1,168 @@
+{
+  "Tax Organizer":[
+    "TAX ORGANIZER" ,
+    "Topic Index" ,
+    "State Information" ,
+    "Questions (Page 1 of 5)" ,
+    "Questions (Page 2 of 5)" ,
+    "Questions (Page 3 of 5)" ,
+    "Questions (Page 4 of 5)" ,
+    "Questions (Page 5 of 5)" ,
+    "Personal lnformation" ,
+    "Dependents and Wages" ,
+    "Direct Deposit and Withdrawal" ,
+    "Electronic Filing" ,
+    "Engagement Letter" ,
+    "Friedman Letter" ,
+    "FLLP Letter" ,
+    "HBK Letter" ,
+    "HBK Consent letter" ,
+    "Tax Engagement Letter" ,
+    "Driving License"
+  ] ,
+  "Tax Information":[
+    "Email Information" ,
+    "Client Email" ,
+    "Tax Information" ,
+    "Check Information" ,
+    "Foreign Assets" ,
+    "Foreign Tax" ,
+    "Foreign Incomes and Taxes Sumary" ,
+    "Notices from IRS" ,
+    "IRS Notice" ,
+    "Hand Written Info" ,
+    "Hand written tax information" ,
+    "Additional Information"
+  ] ,
+  "Wage Income":[
+    "Form W2" ,
+    "Earnings Statement"
+  ] ,
+  "Interest Income":[
+    "Interest Received" ,
+    "Interest Income" ,
+    "Form 1099-INT"
+  ] ,
+  "Dividend Income":[
+    "Dividend Received" ,
+    "Dividend Income" ,
+    "Form 1099-DIV"
+  ] ,
+  "Capital Gains and Losses":[
+    "Sales of Stocks" ,
+    "Securities" ,
+    "Capital Assets & Installment Sales" ,
+    "Settlement Statement" ,
+    "Closing Statement" ,
+    "HUD Statement" ,
+    "Installment Sales" ,
+    "Form 1099-B"
+  ] ,
+  "1099 Brokerages":[
+    "1099 Brokerages",
+    "Name of Stock"
+  ] ,
+  "Business Income":[
+    "Business Income" ,
+    "P&L Statement" ,
+    "Business Expenses" ,
+    "Business Depreciation" ,
+    "Business Vehicle Expenses" ,
+    "Hand Written Business"
+  ] ,
+  "Rental Income":[
+    "Rental and Royalty Income" ,
+    "Rental Income" ,
+    "Rental and Royalty Expenses" ,
+    "Rental Expenses" ,
+    "Rental Property" ,
+    "Rental Depreciation" ,
+    "Rental Fixed Assets" ,
+    "Rental and Royalty Property and Equipment & Depletion" ,
+    "Rental Vehicle Expenses" ,
+    "Hand Written Rental"
+  ] ,
+  "Partnerships, S-Corporations, Trust":[
+    "Schedule K1 Information" ,
+    "Partnerships" ,
+    "S-Corporations" ,
+    "K1 Letter Information" ,
+    "Form 1065 Sch K1" ,
+    "Form 1120S Sch K1" ,
+    "Form 1041 Sch K1" ,
+    "Grantor Letter"
+  ] ,
+  "IRA & Pension":[
+    "IRA Information" ,
+    "Pension, Annuity and Retirement Plan Information" ,
+    "Pension Information" ,
+    "IRA Portfolio statement" ,
+    "Form 1099 R"
+  ] ,
+  "Miscellaneous Income":[
+    "Miscellaneous Income, Adjustments and Alimony" ,
+    "Miscellaneous Income" ,
+    "Adjustments and Alimony" ,
+    "Form 1099 SSA" ,
+    "Form 1099-NEC" ,
+    "Form 1099-Q" ,
+    "Form 1099-Misc" ,
+    "Form 1099-G" ,
+    "1099-SA"
+  ] ,
+  "Adjustments to Income":[
+    "Misc Adjustments" ,
+    "Miscellaneous Adjustments" ,
+    "Misc. Adj." ,
+    "Tuition Fees" ,
+    "Misc. Adjustments" ,
+    "Form 1098-T" ,
+    "Form 1098T" ,
+    "Form 1098-E" ,
+    "Form 1098E" ,
+    "Form 5498-SA" ,
+    "Form 5498-IRA" ,
+    "Form 1098" ,
+    "Form 1098 MIS"
+  ] ,
+  "Itemized Deduction":[
+    "Medical and Taxes" ,
+    "Pharmacy Bills" ,
+    "Property Tax" ,
+    "RE Taxes" ,
+    "RE Taxes - Check" ,
+    "Personal Property Tax" ,
+    "Mortgage Interest" ,
+    "Mortgage Interest Statement" ,
+    "Contributions" ,
+    "Gifts Made in Trust" ,
+    "Gifts Made Outright to an Individual" ,
+    "Miscellaneous Deductions" ,
+    "Tax Preparation Fees" ,
+    "Accountant Fees" ,
+    "Tax Preparer Fees" ,
+    "Tax Prep Fees" ,
+    "Itemized Deduction"
+  ] ,
+  "Credits & Other Taxes":[
+    "Credits & Other Taxes" ,
+    "Dependent care" ,
+    "Child and dependent care" ,
+    "Sch H" ,
+    "Household Employment Taxes" ,
+    "1095-A" ,
+    "1095-B" ,
+    "1095-C" ,
+    "Stimulus Recovery Rebate"
+  ] ,
+  "Estimated Tax Payments":[
+    "Federal Estimated Tax Payment" ,
+    "Form 1040-ES" ,
+    "Form 1040-V" ,
+    "Form 4868" ,
+    "State and City Estimated Tax Payment" ,
+    "State Tax Payments" ,
+    "State Estimated Tax Payments" ,
+    "Estimated Tax payment"
+  ]
+}
