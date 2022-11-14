@@ -233,6 +233,9 @@ file_validation(row, column)
 print(success_row_list)
 print(error_row_list)
 
+
+success_file_name = path.removesuffix('.xlsx') + '-Success.xlsx'
+error_file_name = path.removesuffix('.xlsx') + '-Error.xlsx'
 # Call a Workbook() function of openpyxl
 # to create a new blank Workbook object
 workbook = Workbook()
@@ -241,8 +244,7 @@ workbook = Workbook()
 # or its sheets and cells, the spreadsheet
 # file will not be saved until you call
 # the save() workbook method.
-success_file_name = path.removesuffix('.xlsx') + '-Success.xlsx'
-error_file_name = path.removesuffix('.xlsx') + '-Error.xlsx'
+
 workbook.save(filename=success_file_name)
 
 wb_success = openpyxl.load_workbook(success_file_name)
@@ -252,9 +254,10 @@ sheet_success = wb_success.active
 for rows in tuple(success_row_list):
     sheet_success.append(tuple(rows))
 
+wb_success.save(success_file_name)
+
 workbook = Workbook()
 workbook.save(filename=error_file_name)
-wb_success.save(success_file_name)
 
 wb_error = openpyxl.load_workbook(error_file_name)
 

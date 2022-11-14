@@ -97,8 +97,8 @@ for row in rows:
         if fields[count] == 'created time':
             try:
                 time = col.split(',')
-                for digit in range(len(time)):
-                    time[digit] = int(time[digit])
+                for i in range(len(time)):
+                    time[i] = int(time[i])
                 print(time)
                 print(datetime.strftime(datetime(time[0], time[1], time[2], time[3], time[4], time[5]),
                                         '%Y, %m, %d, %H, %M, %S'))
