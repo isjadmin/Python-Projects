@@ -40,7 +40,7 @@ rows = [['abc', 1234567890, 'abc@gmail.com', datetime.strftime(datetime(2022, 11
          165, 'www.efg.com', None, 20, 22.5, 'C', 6, 'Python', 7, 'Java', 4]]
 
 # name of csv file
-filename = "D:\\Python-Projects\\NLP\\File-validation\\Book1.csv"
+filename = "D:\\Python-Projects\\NLP\\File-validation\\Book2.csv"
 
 # writing to csv file
 with open(filename, 'w') as csvfile:
