@@ -6,6 +6,8 @@ import mysql.connector
 from mysql.connector import Error
 import csv
 import logging
+import threading
+import os
 
 
 FIELD_NAMES = ['name', 'mob no', 'email', 'created time', 'testscore', 'linked resume', 'notice period',
@@ -566,6 +568,55 @@ def email_validation(email_string):
         return False
 
 
+def thread_execution(row_id, path, job_id):
+    print(threading.current_thread().name)
+    connection = create_server_connection()
+
+    query = f'''select SkillName, SkillId From jobskill where JobId = {job_id};'''
+
+    job_skill_result = read_query(connection, query)
+
+    print(f"job_skill_result: {job_skill_result}")
+
+    job_skill_required = []
+
+    if job_skill_result is not None and len(job_skill_result) > 0:
+        for job_skill in job_skill_result:
+            job_skill_required.append({str(job_skill[0]): int(job_skill[1])})
+    else:
+        print(f"Job Skills does not found for given Job ID: {job_id}")
+
+    print(f"job_skill_required: {job_skill_required}")
+
+    file_writing_flag = False
+    if ".csv" in path:
+        csv_obj = CsvFileValidation(path, job_skill_required)
+        file_writing_flag = csv_obj.csv_file_writing()
+    elif ".xlsx" in path:
+        excel_obj = ExcelFileValidation(path, job_skill_required)
+        file_writing_flag = excel_obj.excel_file_writing()
+    else:
+        logging.warning(f"Given File Path for row-id {row_id} is invalid")
+
+    time_now = datetime.now()
+    time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
+    if file_writing_flag:
+        query = f'''UPDATE {TABLE_NAME}
+                    SET {TABLE_COLUMN_PROCESS_STATE} = 1
+                    WHERE {TABLE_COLUMN_ID} = '{row_id}';
+                    '''
+        execute_query(connection, query)
+
+        query = f'''UPDATE {TABLE_NAME}
+                    SET {TABLE_COLUMN_FILE_UPDATE_TIME} = '{time_now}'
+                    WHERE {TABLE_COLUMN_ID} = '{row_id}';
+                    '''
+        execute_query(connection, query)
+    else:
+        logging.info("No file to Update")
+    connection.close()
+
+
 def main():
     try:
         connection = create_server_connection()
@@ -576,62 +627,27 @@ def main():
         '''
 
         query_results = read_query(connection, query)
-        print(query_results)
+        # print(query_results)
 
         if query_results is not None and len(query_results) > 0:
             for result in query_results:
                 # print(result)
                 # print(type(result[1]))
-                row_id = result[0]
+                row_id = int(result[0])
                 path = str(result[1])
                 job_id = int(result[2])
 
-                query = f'''
-                select SkillName, SkillId From jobskill where JobId = {job_id};
-                '''
+                t1 = threading.Thread(target=thread_execution, name='t1', args=(row_id, path, job_id))
+                t2 = threading.Thread(target=thread_execution, name='t2', args=(row_id, path, job_id))
 
-                job_skill_result = read_query(connection, query)
+                print(threading.current_thread().ident)
 
-                print(f"job_skill_result: {job_skill_result}")
+                if row_id % 2 == 1:
+                    t1.start()
+                    # print(threading.current_thread().name)
+                if row_id % 2 == 0:
+                    t2.start()
 
-                job_skill_required = []
-
-                if job_skill_result is not None and len(job_skill_result) > 0:
-                    for job_skill in job_skill_result:
-                        job_skill_required.append({str(job_skill[0]): int(job_skill[1])})
-                else:
-                    print(f"Job Skills does not found for given Job ID: {job_id}")
-
-                print(f"job_skill_required: {job_skill_required}")
-
-                file_writing_flag = False
-                if ".csv" in path:
-                    csv_obj = CsvFileValidation(path, job_skill_required)
-                    file_writing_flag = csv_obj.csv_file_writing()
-                elif ".xlsx" in path:
-                    excel_obj = ExcelFileValidation(path, job_skill_required)
-                    file_writing_flag = excel_obj.excel_file_writing()
-                else:
-                    logging.warning(f"Given File Path for row-id {row_id} is invalid")
-
-                time_now = datetime.now()
-                time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
-                if file_writing_flag:
-                    query = f'''
-                    UPDATE {TABLE_NAME}
-                    SET {TABLE_COLUMN_PROCESS_STATE} = 1
-                    WHERE {TABLE_COLUMN_ID} = '{row_id}';
-                    '''
-                    execute_query(connection, query)
-
-                    query = f'''
-                    UPDATE {TABLE_NAME}
-                    SET {TABLE_COLUMN_FILE_UPDATE_TIME} = '{time_now}'
-                    WHERE {TABLE_COLUMN_ID} = '{row_id}';
-                    '''
-                    execute_query(connection, query)
-                else:
-                    logging.info("No file to Update")
         else:
             logging.info("No new file to update")
         connection.close()

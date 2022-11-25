@@ -1,0 +1,8 @@
+take the csv from upload table
+validation of name, email-id, mob-no, created-date from csv
+download the resume
+validate skill present in skill table
+match the skill with job skill table with job-ID(from upload)
+if skill matches with job-ID insert the detail in Candidate Table
+and insert the skills in candidate skill Tables (take skill id from skill table)
+
