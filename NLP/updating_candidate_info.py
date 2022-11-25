@@ -319,12 +319,22 @@ def candidate_skill_table_update(candidate_skills):
         id_result = read_query(connection, id_query)
 
         if id_result is not None and len(id_result) > 0:
+            print(id_result[0])
             for skill in candidate_skill[1:]:
-                skill_update_query = f'''INSERT INTO {CANDIDATE_SKILL_TABLE_NAME} 
-                (`{CANDIDATE_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_SKILL_TABLE_SKILL_ID}`) 
-                VALUES ({id_result[0]}, {skill});'''
+                skill_check_query = f'''select {CANDIDATE_SKILL_TABLE_SKILL_ID} from {CANDIDATE_SKILL_TABLE_NAME} 
+                where {CANDIDATE_SKILL_TABLE_CANDIDATE_ID} = {skill}'''
 
-                execute_query(connection, skill_update_query)
+                skill_check_result = read_query(connection, skill_check_query)
+
+                if skill_check_result is not None and len(skill_check_result) > 0:
+                    logging.info(f"Skill id {skill} already present for candidate id {int(id_result[0][0])}")
+                    print(f"Skill id {skill} already present for candidate id {int(id_result[0][0])}")
+                else:
+                    skill_insert_query = f'''INSERT INTO {CANDIDATE_SKILL_TABLE_NAME} 
+                    (`{CANDIDATE_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_SKILL_TABLE_SKILL_ID}`) 
+                    VALUES ({int(id_result[0][0])}, {skill});'''
+
+                    execute_query(connection, skill_insert_query)
         else:
             logging.warning("Invalid candidate Id")
 
