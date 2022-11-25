@@ -7,7 +7,6 @@ from mysql.connector import Error
 import csv
 import logging
 import threading
-import os
 
 
 FIELD_NAMES = ['name', 'mob no', 'email', 'created time', 'testscore', 'linked resume', 'notice period',

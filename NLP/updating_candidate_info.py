@@ -1,7 +1,4 @@
 import openpyxl
-from openpyxl import Workbook
-import re
-from datetime import datetime
 import mysql.connector
 from mysql.connector import Error
 import csv
@@ -321,8 +318,9 @@ def candidate_skill_table_update(candidate_skills):
         if id_result is not None and len(id_result) > 0:
             print(id_result[0])
             for skill in candidate_skill[1:]:
-                skill_check_query = f'''select {CANDIDATE_SKILL_TABLE_SKILL_ID} from {CANDIDATE_SKILL_TABLE_NAME} 
-                where {CANDIDATE_SKILL_TABLE_CANDIDATE_ID} = {skill}'''
+                skill_check_query = f'''select * from {CANDIDATE_SKILL_TABLE_NAME} 
+                where {CANDIDATE_SKILL_TABLE_CANDIDATE_ID} = {int(id_result[0][0])} and 
+                {CANDIDATE_SKILL_TABLE_SKILL_ID} = {skill}'''
 
                 skill_check_result = read_query(connection, skill_check_query)
 
