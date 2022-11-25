@@ -376,6 +376,10 @@ def main():
                 if len(candidate_details) > 0 and len(candidate_skill_id) > 0:
                     update_candidate_table(candidate_details)
                     candidate_skill_table_update(candidate_skill_id)
+                    query = f'''UPDATE {TABLE_NAME}
+                                SET {TABLE_COLUMN_PROCESS_STATE} = 2
+                                WHERE {TABLE_COLUMN_ID} = '{row_id}';'''
+                    execute_query(connection, query)
         else:
             logging.info("No new file to update")
         connection.close()
