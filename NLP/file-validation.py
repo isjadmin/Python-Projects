@@ -2,16 +2,17 @@ import openpyxl
 from openpyxl import Workbook
 import re
 import datetime
+from datetime import datetime
 import time
 import mysql.connector
 from mysql.connector import Error
 
 success_row_list = [['name', 'mob no', 'email', 'created time', 'testscore', 'linked resume', 'notice period',
-                     'current ctc', 'expected ctc', 'skill1', 'skill1 years', 'skill2', 'skill2 years',
-                     'skill3', 'skill3 years', 'remark']]
+                     'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2', 'skill2 ID',
+                     'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']]
 error_row_list = [['name', 'mob no', 'email', 'created time', 'testscore', 'linked resume', 'notice period',
-                   'current ctc', 'expected ctc', 'skill1', 'skill1 years', 'skill2', 'skill2 years',
-                   'skill3', 'skill3 years', 'remark']]
+                   'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2', 'skill2 ID',
+                   'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']]
 success_flag = True
 remark = ""
 
@@ -60,12 +61,16 @@ def check_email(s):
         return False
 
 
+CNADIDATE_SKILL_DICT = {}
+
+
 def file_validation(row, column):
     for j in range(2, row + 1):
         success_flag = True
         # time.sleep(2)
         row_list = []
         remark = ""
+        skill_list = []
         for i in range(1, column + 1):
             # print(sheet_obj.cell(row=j, column=i).value)
             if sheet_obj.cell(row=1, column=i).value == 'name':
@@ -93,7 +98,7 @@ def file_validation(row, column):
                 # print('created time: ', type(sheet_obj.cell(row=j, column=i).value))
                 created_time = sheet_obj.cell(row=j, column=i).value
                 row_list.append(created_time)
-                if created_time is None or type(created_time) != datetime.datetime:
+                if created_time is None or type(created_time) != datetime:
                     success_flag = False
                     remark += "Invalid Created Time, "
             if sheet_obj.cell(row=1, column=i).value == 'testscore':
@@ -132,6 +137,20 @@ def file_validation(row, column):
                 row_list.append(skill1)
                 if skill1 is None or type(skill1) != str:
                     remark += "Invalid Skill1, "
+                    row_list.append(None)
+                else:
+                    query = f""" SELECT Id FROM skills WHERE Title = '{skill1}'"""
+                    skill_result = read_query(connection, query)
+                    if len(skill_result) > 0:
+                        # print(skill_result)
+                        skill_list.append({str(skill1).upper(): int(skill_result[0][0])})
+                        row_list.append(int(skill_result[0][0]))
+                        # CNADIDATE_SKILL_DICT[mob_no] = [skill1, skill_result]
+                    else:
+                        row_list.append(None)
+                        print("SKILL1 NOT FOUND")
+                        success_flag = False
+                        remark += "skill1 is not present, "
             if sheet_obj.cell(row=1, column=i).value == 'skill1 years':
                 # print('skill1 years: ', type(sheet_obj.cell(row=j, column=i).value))
                 skill1_years = sheet_obj.cell(row=j, column=i).value
@@ -144,6 +163,20 @@ def file_validation(row, column):
                 row_list.append(skill2)
                 if skill2 is None or type(skill2) != str:
                     remark += "Invalid Skill2, "
+                    row_list.append(None)
+                else:
+                    query = f""" SELECT Id FROM skills WHERE Title = '{skill2}'"""
+                    skill_result = read_query(connection, query)
+                    if len(skill_result) > 0:
+                        # print(skill_result)
+                        skill_list.append({str(skill2).upper(): int(skill_result[0][0])})
+                        row_list.append(int(skill_result[0][0]))
+                        # CNADIDATE_SKILL_DICT[mob_no]= [skill2, skill_result]
+                    else:
+                        row_list.append(None)
+                        print("SKILL2 NOT FOUND")
+                        success_flag = False
+                        remark += "skill2 is not present, "
             if sheet_obj.cell(row=1, column=i).value == 'skill2 years':
                 # print('skill2 years: ', type(sheet_obj.cell(row=j, column=i).value))
                 skill2_years = sheet_obj.cell(row=j, column=i).value
@@ -156,12 +189,37 @@ def file_validation(row, column):
                 row_list.append(skill3)
                 if skill3 is None or type(skill3) != str:
                     remark += "Invalid Skill3, "
+                    row_list.append(None)
+                else:
+                    query = f""" SELECT Id FROM skills WHERE Title = '{skill3}'"""
+                    skill_result = read_query(connection, query)
+                    if len(skill_result) > 0:
+                        # print(skill_result)
+                        skill_list.append({str(skill3).upper(): int(skill_result[0][0])})
+                        row_list.append(int(skill_result[0][0]))
+                        # CNADIDATE_SKILL_DICT[mob_no] = [skill3, skill_result]
+                    else:
+                        row_list.append(None)
+                        print("SKILL3 NOT FOUND")
+                        success_flag = False
+                        remark += "skill3 is not present, "
             if sheet_obj.cell(row=1, column=i).value == 'skill3 years':
                 # print('skill3 years: ', type(sheet_obj.cell(row=j, column=i).value))
                 skill3_years = sheet_obj.cell(row=j, column=i).value
                 row_list.append(skill3_years)
                 if skill3_years is None or (type(skill3_years) != float and type(skill3_years) != int):
                     remark += "Invalid Skill3 Years, "
+        print(skill_list)
+        if len(skill_list) > 0:
+            count = 0
+            for skill in skill_list:
+                if skill in job_skill_required:
+                    count += 1
+            if count > 0:
+                print(count)
+            else:
+                success_flag = False
+                remark += "Given Skills does not match with required job skills"
         row_list.append(remark.removesuffix(', '))
         print(row_list)
         print('-------------------------------------------------------------------------------------------------------')
@@ -180,12 +238,12 @@ path = ""
 
 pw = "Smprajkta4$"
 
-db = "job_seeker_data"
+db = "jobztop"
 
 connection = create_server_connection("localhost", "root", pw, db)
 
 q1 = '''
-select * From Upload;
+select * From upload;
 '''
 
 results = read_query(connection, q1)
@@ -194,7 +252,7 @@ for result in results:
     print(result)
 
 q2 = '''
-select user_id, path From Upload where processed_state = 0;
+select user_id, path, job_id From upload where processed_state = 0;
 '''
 
 results = read_query(connection, q2)
@@ -205,12 +263,31 @@ if results is not None:
         print(type(result[1]))
         user_id = result[0]
         path = str(result[1])
+        job_id = int(result[2])
 else:
     print("Results is None")
 
+q2 = f'''
+select SkillName, SkillId From jobskill where JobId = {job_id};
+'''
+
+job_skill_result = read_query(connection, q2)
+
+
+print(f"job_skill_required: {job_skill_result}")
+
+job_skill_required = []
+
+if job_skill_result is not None:
+    for result in job_skill_result:
+        job_skill_required.append({str(result[0]): int(result[1])})
+else:
+    print("Results is None")
+
+print(f"job_skill_required: {job_skill_required}")
 
 print(path)
-path = path + '\Book1.xlsx'
+path = path
 print(path)
 # To open the workbook
 # workbook object is created
@@ -277,11 +354,22 @@ WHERE user_id = '{user_id}';
 
 execute_query(connection, q3)
 
+time_now = datetime.now()
+time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
+query = f'''
+        UPDATE upload
+        SET file_update_time = '{time_now}'
+        WHERE user_id = '{user_id}';
+        '''
+execute_query(connection, query)
+
+print(CNADIDATE_SKILL_DICT)
+
 q1 = '''
-select * From Upload;
+select * From upload;
 '''
 
-results = read_query(connection, q1)
+'''results = read_query(connection, q1)
 
 for result in results:
-    print(result)
+    print(result)'''
