@@ -328,20 +328,20 @@ def update_candidate_table(candidate_details):
 
             if detail_result is not None and len(detail_result) > 0:
                 update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_CCTC}` = {detail[5]}, 
-                `{CANDIDATE_TABLE_COLUMN_ECTC}` = {detail[6]}, `{CANDIDATE_TABLE_FIRST_NAME}` = {detail[0]}, 
+                `{CANDIDATE_TABLE_COLUMN_ECTC}` = {detail[6]}, `{CANDIDATE_TABLE_FIRST_NAME}` = '{detail[0]}', 
                 `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}` = {detail[4]} 
                 WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0][0]});'''
 
                 execution_flag = execute_query(connection, update_query)
                 print(execution_flag)
-
+                email_update_flag = False
                 if detail_result[0][1] != detail[2]:
                     update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET
-                    `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}` = {detail[2]}
-                    WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0]});'''
+                    `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}` = '{detail[2]}'
+                    WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0][0]});'''
 
                     email_update_flag = execute_query(connection, update_query)
-                    print(email_update_flag)
+                print(email_update_flag)
 
             else:
                 detail[3] = detail[3].strftime('%Y-%m-%d %H:%M:%S')
