@@ -3,16 +3,18 @@ import mysql.connector
 from mysql.connector import Error
 import csv
 import logging
+import json
+from datetime import datetime
 
 
 FIELD_NAMES = ['name', 'mob no', 'email', 'created time', 'testscore', 'linked resume', 'notice period',
                'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2', 'skill2 ID',
                'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']
 
-HOST_NAME = "localhost"
-USER_NAME = "root"
-PASSWORD = "Smprajkta4$"
-DB_NAME = "jobztop"
+HOST_NAME = ""
+USER_NAME = ""
+PASSWORD = ""
+DB_NAME = ""
 
 TABLE_NAME = "upload"
 TABLE_COLUMN_ID = "id"
@@ -27,6 +29,7 @@ CANDIDATE_TABLE_COLUMN_CCTC = "CTC"
 CANDIDATE_TABLE_COLUMN_ECTC = "ECTC"
 CANDIDATE_TABLE_COLUMN_EMAIL_ID = "EmailId"
 CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD = "NoticePeriod"
+CANDIDATE_TABLE_COLUMN_CREATED_TIME = "CreatedTime"
 
 CANDIDATE_SKILL_TABLE_NAME = "candidateskill"
 CANDIDATE_SKILL_TABLE_CANDIDATE_ID = "CandidateId"
@@ -85,6 +88,14 @@ class CsvFileValidation:
                     if len(col) > 0:
                         print(col)
                         candidate_detail_list.append(col)
+                    else:
+                        candidate_detail_list.append('0')
+                if self.fields[count] == FIELD_NAMES[3]:
+                    if len(col) > 0:
+                        print(col)
+                        created_time = col
+                        created_time = datetime.strptime(created_time, '%Y, %m, %d, %H, %M, %S')
+                        candidate_detail_list.append(created_time)
                     else:
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[6]:
@@ -194,6 +205,14 @@ class ExcelFileValidation:
                         candidate_detail_list.append('0')
                     else:
                         candidate_detail_list.append(email_id)
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[3]:
+                    # print('email: ', type(sheet_obj.cell(row=j, column=i).value))
+                    created_time = self.sheet_obj.cell(row=j, column=i).value
+                    if created_time is None:
+                        candidate_detail_list.append('0')
+                    else:
+                        created_time = created_time.strftime('%Y-%m-%d %H:%M:%S')
+                        candidate_detail_list.append(created_time)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[6]:
                     # print('notice period: ', type(sheet_obj.cell(row=j, column=i).value))
                     notice_period = self.sheet_obj.cell(row=j, column=i).value
@@ -242,6 +261,19 @@ class ExcelFileValidation:
 ########################################################################################################################
 
 
+def reading_config_file():
+    f = open('config.json', "r")
+    data = json.load(f)
+    global HOST_NAME
+    HOST_NAME = data["host_name"]
+    global USER_NAME
+    USER_NAME = data["user_name"]
+    global PASSWORD
+    PASSWORD = data["password"]
+    global DB_NAME
+    DB_NAME = data["db_name"]
+
+
 def create_server_connection():
     connect = None
     try:
@@ -263,8 +295,10 @@ def execute_query(connect, query):
         cursor.execute(query)
         connect.commit()
         print("Query Execute Successfully")
+        return True
     except Error as err:
         print(f"Error : {err}")
+        return False
 
 
 def read_query(connect, query):
@@ -280,35 +314,57 @@ def read_query(connect, query):
 
 
 def update_candidate_table(candidate_details):
+    execution_flag = False
     connection = create_server_connection()
-    for detail in candidate_details:
-        query = f'''select {CANDIDATE_TABLE_COLUMN_ID} From {CANDIDATE_TABLE_NAME} 
-        where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {detail[1]}'''
+    try:
+        for detail in candidate_details:
+            query = f'''select {CANDIDATE_TABLE_COLUMN_ID}, {CANDIDATE_TABLE_COLUMN_EMAIL_ID} 
+            From {CANDIDATE_TABLE_NAME} where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {detail[1]}'''
 
-        print(detail[2])
+            print(detail[2])
 
-        detail_result = read_query(connection, query)
+            detail_result = read_query(connection, query)
+            print(detail_result)
 
-        if detail_result is not None and len(detail_result) > 0:
-            update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_CCTC}` = {detail[4]}, 
-            `{CANDIDATE_TABLE_COLUMN_ECTC}` = {detail[5]}, `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}` = {detail[2]}, 
-            `{CANDIDATE_TABLE_FIRST_NAME}` = {detail[0]}, `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}` = {detail[3]} 
-            WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0]});'''
+            if detail_result is not None and len(detail_result) > 0:
+                update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_CCTC}` = {detail[5]}, 
+                `{CANDIDATE_TABLE_COLUMN_ECTC}` = {detail[6]}, `{CANDIDATE_TABLE_FIRST_NAME}` = {detail[0]}, 
+                `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}` = {detail[4]} 
+                WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0][0]});'''
 
-            execute_query(connection, update_query)
+                execution_flag = execute_query(connection, update_query)
+                print(execution_flag)
 
+                if detail_result[0][1] != detail[2]:
+                    update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET
+                    `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}` = {detail[2]}
+                    WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0]});'''
+
+                    email_update_flag = execute_query(connection, update_query)
+                    print(email_update_flag)
+
+            else:
+                detail[3] = detail[3].strftime('%Y-%m-%d %H:%M:%S')
+                insert_query = f'''INSERT INTO {CANDIDATE_TABLE_NAME} (`{CANDIDATE_TABLE_COLUMN_CCTC}`, 
+                `{CANDIDATE_TABLE_COLUMN_ECTC}`, `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}`, `{CANDIDATE_TABLE_FIRST_NAME}`, 
+                `{CANDIDATE_TABLE_COLUMN_MOB_NO}`, `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}`, 
+                `{CANDIDATE_TABLE_COLUMN_CREATED_TIME}`) VALUES ({detail[5]}, {detail[6]}, '{detail[2]}', 
+                '{detail[0]}', {detail[1]}, {detail[4]}, '{detail[3]}');'''
+
+                execution_flag = execute_query(connection, insert_query)
+
+        connection.close()
+        if execution_flag:
+            return True
         else:
-            insert_query = f'''INSERT INTO {CANDIDATE_TABLE_NAME} (`{CANDIDATE_TABLE_COLUMN_CCTC}`, 
-            `{CANDIDATE_TABLE_COLUMN_ECTC}`, `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}`, `{CANDIDATE_TABLE_FIRST_NAME}`, 
-            `{CANDIDATE_TABLE_COLUMN_MOB_NO}`, `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}`) VALUES ({detail[4]}, 
-            {detail[5]}, '{detail[2]}', '{detail[0]}', {detail[1]}, {detail[3]});'''
-
-            execute_query(connection, insert_query)
-
-    connection.close()
+            return False
+    except Exception as e:
+        logging.exception(f"Error updating candidate table {e}")
+        return False
 
 
 def candidate_skill_table_update(candidate_skills):
+    execution_flag = False
     connection = create_server_connection()
     for candidate_skill in candidate_skills:
         id_query = f'''select {CANDIDATE_TABLE_COLUMN_ID} From {CANDIDATE_TABLE_NAME} 
@@ -332,12 +388,18 @@ def candidate_skill_table_update(candidate_skills):
                     (`{CANDIDATE_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_SKILL_TABLE_SKILL_ID}`) 
                     VALUES ({int(id_result[0][0])}, {skill});'''
 
-                    execute_query(connection, skill_insert_query)
+                    execution_flag = execute_query(connection, skill_insert_query)
         else:
             logging.warning("Invalid candidate Id")
+    connection.close()
+    if execution_flag:
+        return True
+    else:
+        return False
 
 
 def main():
+    reading_config_file()
     try:
         connection = create_server_connection()
 
@@ -372,12 +434,13 @@ def main():
                 else:
                     logging.warning(f"Given File Path for row-id {row_id} is invalid")
                 if len(candidate_details) > 0 and len(candidate_skill_id) > 0:
-                    update_candidate_table(candidate_details)
-                    candidate_skill_table_update(candidate_skill_id)
-                    query = f'''UPDATE {TABLE_NAME}
-                                SET {TABLE_COLUMN_PROCESS_STATE} = 2
-                                WHERE {TABLE_COLUMN_ID} = '{row_id}';'''
-                    execute_query(connection, query)
+                    update_table_flag = update_candidate_table(candidate_details)
+                    if update_table_flag:
+                        skill_flag = candidate_skill_table_update(candidate_skill_id)
+                        query = f'''UPDATE {TABLE_NAME}
+                                    SET {TABLE_COLUMN_PROCESS_STATE} = 2
+                                    WHERE {TABLE_COLUMN_ID} = '{row_id}';'''
+                        execute_query(connection, query)
         else:
             logging.info("No new file to update")
         connection.close()

@@ -7,16 +7,18 @@ from mysql.connector import Error
 import csv
 import logging
 import threading
+import json
 
 
 FIELD_NAMES = ['name', 'mob no', 'email', 'created time', 'testscore', 'linked resume', 'notice period',
                'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2', 'skill2 ID',
                'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']
 
-HOST_NAME = "localhost"
-USER_NAME = "root"
-PASSWORD = "Smprajkta4$"
-DB_NAME = "jobztop"
+HOST_NAME = ""
+USER_NAME = ""
+PASSWORD = ""
+DB_NAME = ""
+
 TABLE_NAME = "upload"
 TABLE_COLUMN_ID = "id"
 TABLE_COLUMN_PATH = "path"
@@ -518,6 +520,19 @@ class ExcelFileValidation:
 ########################################################################################################################
 
 
+def reading_config_file():
+    f = open('config.json', "r")
+    data = json.load(f)
+    global HOST_NAME
+    HOST_NAME = data["host_name"]
+    global USER_NAME
+    USER_NAME = data["user_name"]
+    global PASSWORD
+    PASSWORD = data["password"]
+    global DB_NAME
+    DB_NAME = data["db_name"]
+
+
 def create_server_connection():
     connect = None
     try:
@@ -598,7 +613,9 @@ def thread_execution(row_id, path, job_id):
         logging.warning(f"Given File Path for row-id {row_id} is invalid")
 
     time_now = datetime.now()
+    print(type(time_now))
     time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
+    print(type(time_now))
     if file_writing_flag:
         query = f'''UPDATE {TABLE_NAME}
                     SET {TABLE_COLUMN_PROCESS_STATE} = 1
@@ -617,6 +634,7 @@ def thread_execution(row_id, path, job_id):
 
 
 def main():
+    reading_config_file()
     try:
         connection = create_server_connection()
 
