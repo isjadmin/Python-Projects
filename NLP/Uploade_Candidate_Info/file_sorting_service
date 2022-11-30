@@ -9,7 +9,6 @@
 
 appname=file_sorting
 directory=/home/ubuntu/python_files/file_sorting
-requirement=$directory/requirement.txt
 execu=$directory/file_sorting_with_thread.py
 pid=$directory/file_sorting_with_thread.pid
 logfile=$directory/file_sorting_with_thread.log
@@ -35,21 +34,6 @@ start)
    fi
    echo $appname is starting..
    echo "start on" $(date) >> $logfile
-
-   pip3 install -r $requirement >> $logfile 2>&1 &
-   pidval=$!
-   echo $pidval
-   sleep 1
-   if [[ "$(ps -aux | grep $pidval |grep -c $execu)" -eq 1 ]]; then
-          touch $pid
-          echo "Successfully installed python requirements"
-          exit 0
-   else
-          echo 0:"Failed to install python requirements"
-          printf "${RED}[FAILED]${NC}\n"
-          rm -f $pid
-          exit 1
-   fi
 
    python3 -u $execu >> $logfile 2>&1 &
    pidval=$!
