@@ -522,7 +522,7 @@ class ExcelFileValidation:
 
 
 def reading_config_file():
-    f = open('config.json', "r")
+    f = open('/mnt/d/Python-Projects/NLP/Uploade_Candidate_Info/config.json', "r")
     data = json.load(f)
     global HOST_NAME
     HOST_NAME = data["host_name"]

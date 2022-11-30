@@ -294,7 +294,7 @@ class ExcelFileValidation:
 
 
 def reading_config_file():
-    f = open('config.json', "r")
+    f = open('./config.json', "r")
     data = json.load(f)
     global HOST_NAME
     HOST_NAME = data["host_name"]
@@ -452,7 +452,7 @@ def resume_download(resume_link_list):
                 logging.warning(f"resume link not available for candidate id: {candidate_id}")
                 continue
             url = link_detail[1]
-            current_resume_directory = RESUME_DIRECTORY_PATH + "\\" + str(candidate_id)
+            current_resume_directory = RESUME_DIRECTORY_PATH + "/" + str(candidate_id)
             if os.path.isdir(current_resume_directory):
                 pass
             else:
@@ -462,7 +462,7 @@ def resume_download(resume_link_list):
                     logging.exception(f"Error creating parent directory {RESUME_DIRECTORY_PATH}: {e}")
                     continue
 
-            resume_path = current_resume_directory + "\\"
+            resume_path = current_resume_directory + "/"
             print(resume_path)
             f = ""
             try:
@@ -476,8 +476,9 @@ def resume_download(resume_link_list):
                 except Exception as e:
                     logging.exception(f"cannot download the resume for candidate-id {candidate_id}: {e}")
             if f is not None:
-                f = f.replace("\\", "\\\\")
-                f_list = f.split("\\\\")
+                # f = f.replace("\\", "\\\\")
+                # f_list = f.split("\\\\")
+                f_list = f.split("/")
                 update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_RESUME_PATH}` = '{f}', 
                                 `{CANDIDATE_TABLE_COLUMN_RESUME_NAME}` = '{f_list[-1]}', 
                                 `{CANDIDATE_TABLE_COLUMN_RESUME_TYPE}` = '{str(f_list[-1]).split(".")[-1]}'
