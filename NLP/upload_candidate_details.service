@@ -1,0 +1,14 @@
+[Unit]
+Description=Simplified Resourciter logger service
+After=syslog.target
+
+[Service]
+Type=simple
+Restart=always
+WorkingDirectory=/home/ubuntu/python_files/file_sorting
+ExecStart=/usr/bin/python3 /home/ubuntu/python_files/file_sorting/file_sorting_with_thread.py
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,118 @@
+#!/bin/bash
+#Purpose: Sorting CSV files with required details
+#Version: 0.0.1
+#Created Date: Tue Nov 29 11:00:00 IST 2022
+#Modified Date: Tue Nov 29 11:00:00 IST 2022
+#Author: Prajkta
+# START #
+
+
+appname=file_sorting
+directory=/home/ubuntu/python_files/file_sorting
+requirement=$directory/requirement.txt
+execu=$directory/file_sorting_with_thread.py
+pid=$directory/file_sorting_with_thread.pid
+logfile=$directory/file_sorting_with_thread.log
+
+
+RED='\033[0;31m'
+GR='\033[0;32m'
+YL='\033[0;33m'
+NC='\033[0m' # No Color
+
+source ~/.bashrc
+
+case "$1" in
+
+start)
+
+   if [ -e "$pid" ];then
+        if [[ "$(ps -aux | grep `cat $pid` |grep -c $execu)" -eq 1 ]]; then
+          echo 0:$appname is already running, on pid=`cat $pid`
+          printf "${YL}[Already Running]${NC} \n"
+          exit 1
+        fi
+   fi
+   echo $appname is starting..
+   echo "start on" $(date) >> $logfile
+
+   pip3 install -r $requirement >> $logfile 2>&1 &
+   pidval=$!
+   echo $pidval
+   sleep 1
+   if [[ "$(ps -aux | grep $pidval |grep -c $execu)" -eq 1 ]]; then
+          touch $pid
+          echo "Successfully installed python requirements"
+          exit 0
+   else
+          echo 0:"Failed to install python requirements"
+          printf "${RED}[FAILED]${NC}\n"
+          rm -f $pid
+          exit 1
+   fi
+
+   python3 -u $execu >> $logfile 2>&1 &
+   pidval=$!
+   echo $pidval
+   sleep 1
+   if [[ "$(ps -aux | grep $pidval |grep -c $execu)" -eq 1 ]]; then
+          touch $pid
+          echo $pidval>$pid
+          echo 1:$appname is started, on pid=`cat $pid`
+          printf "${GR}[Started]${NC}\n"
+          exit 0
+   else
+          echo 0:$appname is NOT started
+          printf "${RED}[FAILED]${NC}\n"
+          rm -f $pid
+          exit 1
+   fi
+   ;;
+
+stop)
+
+   if [ -e "$pid" ];then
+        if [[ "$(ps -aux | grep `cat $pid` |grep -c $execu)" -eq 1 ]]; then
+                echo $appname is stoping...
+                kill `cat $pid`
+                rm -f $pid
+                printf "${RED}[Stoped]${NC}\n"
+                exit 0
+        else
+                echo 0:$appname is NOT running
+                printf "${RED}[Inactive]${NC}\n"
+                rm -f $pid
+                exit 0
+        fi
+   else
+        echo 0:$appname is NOT running
+        printf "${RED}[Inactive]${NC}\n"
+   fi
+   ;;
+
+restart)
+   $0 stop
+   $0 start
+   ;;
+
+status)
+   if [ -e "$pid" ];then
+        if [[ "$(ps -aux | grep `cat $pid` |grep -c $execu)" -eq 1 ]]; then
+        echo 1:$appname is running, pid=`cat $pid`
+        printf "${GR}[Active]${NC}\n"
+        else
+        echo 0:$appname is NOT running
+        printf "${RED}[Inactive]${NC}\n"
+        rm -f $pid
+        exit 1
+        fi
+   else
+        echo 0:$appname is NOT running
+        printf "${RED}[Inactive]${NC}\n"
+   fi
+   ;;
+*)
+   echo "Usage: $0 {start|stop|status|restart}"
+esac
+
+exit 0

@@ -8,6 +8,7 @@ import csv
 import logging
 import threading
 import json
+import time
 
 
 FIELD_NAMES = ['name', 'mob no', 'email', 'created time', 'testscore', 'linked resume', 'notice period',
@@ -636,38 +637,40 @@ def thread_execution(row_id, path, job_id):
 def main():
     reading_config_file()
     try:
-        connection = create_server_connection()
+        while True:
+            connection = create_server_connection()
 
-        query = f'''
-        select {TABLE_COLUMN_ID}, {TABLE_COLUMN_PATH}, {TABLE_COLUMN_JOB_ID} From 
-        {TABLE_NAME} where {TABLE_COLUMN_PROCESS_STATE} = 0;
-        '''
+            query = f'''
+            select {TABLE_COLUMN_ID}, {TABLE_COLUMN_PATH}, {TABLE_COLUMN_JOB_ID} From 
+            {TABLE_NAME} where {TABLE_COLUMN_PROCESS_STATE} = 0;
+            '''
 
-        query_results = read_query(connection, query)
-        # print(query_results)
+            query_results = read_query(connection, query)
+            # print(query_results)
 
-        if query_results is not None and len(query_results) > 0:
-            for result in query_results:
-                # print(result)
-                # print(type(result[1]))
-                row_id = int(result[0])
-                path = str(result[1])
-                job_id = int(result[2])
+            if query_results is not None and len(query_results) > 0:
+                for result in query_results:
+                    # print(result)
+                    # print(type(result[1]))
+                    row_id = int(result[0])
+                    path = str(result[1])
+                    job_id = int(result[2])
 
-                t1 = threading.Thread(target=thread_execution, name='t1', args=(row_id, path, job_id))
-                t2 = threading.Thread(target=thread_execution, name='t2', args=(row_id, path, job_id))
+                    t1 = threading.Thread(target=thread_execution, name='t1', args=(row_id, path, job_id))
+                    t2 = threading.Thread(target=thread_execution, name='t2', args=(row_id, path, job_id))
 
-                print(threading.current_thread().ident)
+                    print(threading.current_thread().ident)
 
-                if row_id % 2 == 1:
-                    t1.start()
-                    # print(threading.current_thread().name)
-                if row_id % 2 == 0:
-                    t2.start()
+                    if row_id % 2 == 1:
+                        t1.start()
+                        # print(threading.current_thread().name)
+                    if row_id % 2 == 0:
+                        t2.start()
 
-        else:
-            logging.info("No new file to update")
-        connection.close()
+            else:
+                logging.info("No new file to update")
+            connection.close()
+            time.sleep(30)
     except Exception as e:
         logging.exception(f"error in main method {e}")
 

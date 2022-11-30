@@ -5,6 +5,9 @@ import csv
 import logging
 import json
 from datetime import datetime
+import time
+import gdown
+import os
 
 
 FIELD_NAMES = ['name', 'mob no', 'email', 'created time', 'testscore', 'linked resume', 'notice period',
@@ -15,6 +18,8 @@ HOST_NAME = ""
 USER_NAME = ""
 PASSWORD = ""
 DB_NAME = ""
+
+RESUME_DIRECTORY_PATH = ""
 
 TABLE_NAME = "upload"
 TABLE_COLUMN_ID = "id"
@@ -30,6 +35,12 @@ CANDIDATE_TABLE_COLUMN_ECTC = "ECTC"
 CANDIDATE_TABLE_COLUMN_EMAIL_ID = "EmailId"
 CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD = "NoticePeriod"
 CANDIDATE_TABLE_COLUMN_CREATED_TIME = "CreatedTime"
+
+CANDIDATE_TABLE_COLUMN_RESUME_TYPE = "ResumeType"
+CANDIDATE_TABLE_COLUMN_RESUME_ID = "ResumeId"
+CANDIDATE_TABLE_COLUMN_RESUME_NAME = "ResumeName"
+CANDIDATE_TABLE_COLUMN_RESUME_PATH = "ResumePath"
+CANDIDATE_TABLE_COLUMN_RESUME_PARSED = "ResumeParsed"
 
 CANDIDATE_SKILL_TABLE_NAME = "candidateskill"
 CANDIDATE_SKILL_TABLE_CANDIDATE_ID = "CandidateId"
@@ -64,11 +75,13 @@ class CsvFileValidation:
     def csv_required_details(self):
         candidate_details = []
         candidate_skill_id = []
+        resume_list = []
         for row in self.rows:
             # parsing each column of a row
             count = 0
             candidate_detail_list = []
             skill_id_list = []
+            resume_link_list = []
             if len(row) == 0:
                 continue
             for col in row:
@@ -81,9 +94,11 @@ class CsvFileValidation:
                     if len(col) > 0:
                         candidate_detail_list.append(int(col))
                         skill_id_list.append(int(col))
+                        resume_link_list.append(int(col))
                     else:
                         candidate_detail_list.append('0')
                         skill_id_list.append('0')
+                        resume_link_list.append('0')
                 if self.fields[count] == FIELD_NAMES[2]:
                     if len(col) > 0:
                         print(col)
@@ -131,13 +146,19 @@ class CsvFileValidation:
                         skill_id_list.append(int(col))
                     else:
                         skill_id_list.append('0')
+                if self.fields[count] == FIELD_NAMES[5]:
+                    if len(col) > 0:
+                        resume_link_list.append(col)
+                    else:
+                        resume_link_list.append('0')
                 if count < len(self.fields) - 1:
                     count += 1
 
             candidate_details.append(candidate_detail_list)
             candidate_skill_id.append(skill_id_list)
+            resume_list.append(resume_link_list)
 
-        return candidate_details, candidate_skill_id
+        return candidate_details, candidate_skill_id, resume_list
 
 ########################################################################################################################
 
@@ -177,9 +198,11 @@ class ExcelFileValidation:
     def excel_required_details(self):
         candidate_details = []
         candidate_skill_id = []
+        resume_list = []
         for j in range(2, self.row + 1):
             candidate_detail_list = []
             skill_id_list = []
+            resume_link_list = []
             for i in range(1, self.column + 1):
                 # print(sheet_obj.cell(row=j, column=i).value)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[0]:
@@ -198,6 +221,7 @@ class ExcelFileValidation:
                     else:
                         candidate_detail_list.append(mob_no)
                         skill_id_list.append(mob_no)
+                        resume_link_list.append(mob_no)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[2]:
                     # print('email: ', type(sheet_obj.cell(row=j, column=i).value))
                     email_id = self.sheet_obj.cell(row=j, column=i).value
@@ -252,11 +276,19 @@ class ExcelFileValidation:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill3_id)
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[16]:
+                    url = self.sheet_obj.cell(row=j, column=i).value
+                    if url is None:
+                        print("URL not given")
+                        # skill_id_list.append('0')
+                    else:
+                        resume_link_list.append(url)
 
             candidate_details.append(candidate_detail_list)
             candidate_skill_id.append(skill_id_list)
+            resume_list.append(resume_link_list)
 
-        return candidate_details, candidate_skill_id
+        return candidate_details, candidate_skill_id, resume_list
 
 ########################################################################################################################
 
@@ -272,6 +304,8 @@ def reading_config_file():
     PASSWORD = data["password"]
     global DB_NAME
     DB_NAME = data["db_name"]
+    global RESUME_DIRECTORY_PATH
+    RESUME_DIRECTORY_PATH = data["resume_directory_path"]
 
 
 def create_server_connection():
@@ -392,58 +426,121 @@ def candidate_skill_table_update(candidate_skills):
         else:
             logging.warning("Invalid candidate Id")
     connection.close()
-    if execution_flag:
-        return True
+
+
+def resume_download(resume_link_list):
+    if os.path.isdir(RESUME_DIRECTORY_PATH):
+        pass
     else:
-        return False
+        try:
+            os.mkdir(RESUME_DIRECTORY_PATH)
+        except Exception as e:
+            print(e)
+            logging.exception(f"Error creating parent directory {RESUME_DIRECTORY_PATH}: {e}")
+            return
+    connection = create_server_connection()
+    for link_detail in resume_link_list:
+        query = f'''select {CANDIDATE_TABLE_COLUMN_ID} From {CANDIDATE_TABLE_NAME} 
+        where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {link_detail[0]}'''
+
+        detail_result = read_query(connection, query)
+        print(detail_result)
+
+        if detail_result is not None and len(detail_result) > 0:
+            candidate_id = detail_result[0][0]
+            if link_detail[1] == '0':
+                logging.warning(f"resume link not available for candidate id: {candidate_id}")
+                continue
+            url = link_detail[1]
+            current_resume_directory = RESUME_DIRECTORY_PATH + "\\" + str(candidate_id)
+            if os.path.isdir(current_resume_directory):
+                pass
+            else:
+                try:
+                    os.mkdir(current_resume_directory)
+                except Exception as e:
+                    logging.exception(f"Error creating parent directory {RESUME_DIRECTORY_PATH}: {e}")
+                    continue
+
+            resume_path = current_resume_directory + "\\"
+            print(resume_path)
+            f = ""
+            try:
+                f = gdown.download(url, quiet=False, fuzzy=True, output=resume_path)
+            except Exception as e:
+                try:
+                    url_list = url.split('/')
+                    # same as the above, but with the file ID
+                    download_file_id = url_list[5]
+                    f = gdown.download(id=download_file_id, quiet=False, output=resume_path)
+                except Exception as e:
+                    logging.exception(f"cannot download the resume for candidate-id {candidate_id}: {e}")
+            if f is not None:
+                f = f.replace("\\", "\\\\")
+                f_list = f.split("\\\\")
+                update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_RESUME_PATH}` = '{f}', 
+                                `{CANDIDATE_TABLE_COLUMN_RESUME_NAME}` = '{f_list[-1]}', 
+                                `{CANDIDATE_TABLE_COLUMN_RESUME_TYPE}` = '{str(f_list[-1]).split(".")[-1]}'
+                                WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {candidate_id});'''
+
+                update_query_flag = execute_query(connection, update_query)
+
+        else:
+            logging.warning(f"Candidate id not found against mob no. {link_detail[0]}")
+    connection.close()
 
 
 def main():
     reading_config_file()
     try:
-        connection = create_server_connection()
+        while True:
+            connection = create_server_connection()
 
-        query = f'''
-        select {TABLE_COLUMN_ID}, {TABLE_COLUMN_PATH} From {TABLE_NAME} where {TABLE_COLUMN_PROCESS_STATE} = 1;
-        '''
+            query = f'''
+            select {TABLE_COLUMN_ID}, {TABLE_COLUMN_PATH} From {TABLE_NAME} where {TABLE_COLUMN_PROCESS_STATE} = 1;
+            '''
 
-        query_results = read_query(connection, query)
-        print(query_results)
+            query_results = read_query(connection, query)
+            print(query_results)
 
-        if query_results is not None and len(query_results) > 0:
-            for result in query_results:
-                # print(result)
-                # print(type(result[1]))
-                row_id = result[0]
-                path = str(result[1])
-                candidate_details = []
-                candidate_skill_id = []
-                if ".csv" in path:
-                    path = path.removesuffix('.csv') + '-Success.csv'
-                    csv_obj = CsvFileValidation(path)
-                    candidate_details, candidate_skill_id = csv_obj.csv_required_details()
-                    print(f"Candidate details from {path}: \n {candidate_details}")
-                    print(f"Candidate skill ids from {path}: \n {candidate_skill_id}")
-                elif ".xlsx" in path:
-                    path = path.removesuffix('.xlsx') + '-Success.xlsx'
-                    print(path)
-                    excel_obj = ExcelFileValidation(path)
-                    candidate_details, candidate_skill_id = excel_obj.excel_required_details()
-                    print(f"Candidate details from {path}: \n {candidate_details}")
-                    print(f"Candidate skill ids from {path}: \n {candidate_skill_id}")
-                else:
-                    logging.warning(f"Given File Path for row-id {row_id} is invalid")
-                if len(candidate_details) > 0 and len(candidate_skill_id) > 0:
-                    update_table_flag = update_candidate_table(candidate_details)
-                    if update_table_flag:
-                        skill_flag = candidate_skill_table_update(candidate_skill_id)
-                        query = f'''UPDATE {TABLE_NAME}
-                                    SET {TABLE_COLUMN_PROCESS_STATE} = 2
-                                    WHERE {TABLE_COLUMN_ID} = '{row_id}';'''
-                        execute_query(connection, query)
-        else:
-            logging.info("No new file to update")
-        connection.close()
+            if query_results is not None and len(query_results) > 0:
+                for result in query_results:
+                    # print(result)
+                    # print(type(result[1]))
+                    row_id = result[0]
+                    path = str(result[1])
+                    candidate_details = []
+                    candidate_skill_id = []
+                    resume_link_list = []
+                    if ".csv" in path:
+                        path = path.removesuffix('.csv') + '-Success.csv'
+                        csv_obj = CsvFileValidation(path)
+                        candidate_details, candidate_skill_id, resume_link_list = csv_obj.csv_required_details()
+                        print(f"Candidate details from {path}: \n {candidate_details}")
+                        print(f"Candidate skill ids from {path}: \n {candidate_skill_id}")
+                    elif ".xlsx" in path:
+                        path = path.removesuffix('.xlsx') + '-Success.xlsx'
+                        print(path)
+                        excel_obj = ExcelFileValidation(path)
+                        candidate_details, candidate_skill_id, resume_link_list = excel_obj.excel_required_details()
+                        print(f"Candidate details from {path}: \n {candidate_details}")
+                        print(f"Candidate skill ids from {path}: \n {candidate_skill_id}")
+                    else:
+                        logging.warning(f"Given File Path for row-id {row_id} is invalid")
+                    if len(candidate_details) > 0 and len(candidate_skill_id) > 0:
+                        update_table_flag = update_candidate_table(candidate_details)
+                        if update_table_flag:
+                            candidate_skill_table_update(candidate_skill_id)
+                            print(resume_link_list)
+                            resume_download(resume_link_list)
+                            query = f'''UPDATE {TABLE_NAME}
+                                        SET {TABLE_COLUMN_PROCESS_STATE} = 2
+                                        WHERE {TABLE_COLUMN_ID} = '{row_id}';'''
+                            execute_query(connection, query)
+            else:
+                logging.info("No new file to update")
+            connection.close()
+            time.sleep(30)
     except Exception as e:
         logging.exception(f"error in main method {e}")
 
