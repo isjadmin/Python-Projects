@@ -15,6 +15,8 @@ FIELD_NAMES = ['name', 'mob no', 'email', 'created time', 'testscore', 'linked r
                'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2', 'skill2 ID',
                'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']
 
+CONFIG_FILE_PATH = "config.json"
+
 HOST_NAME = ""
 USER_NAME = ""
 PASSWORD = ""
@@ -522,7 +524,7 @@ class ExcelFileValidation:
 
 
 def reading_config_file():
-    f = open('/mnt/d/Python-Projects/NLP/Uploade_Candidate_Info/config.json', "r")
+    f = open(CONFIG_FILE_PATH, "r")
     data = json.load(f)
     global HOST_NAME
     HOST_NAME = data["host_name"]
