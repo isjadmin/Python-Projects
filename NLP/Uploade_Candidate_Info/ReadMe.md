@@ -1,9 +1,9 @@
 pip3 install -r requirement.txt
 
 
-sudo cp "/home/ubuntu/python_files/file_sorting_service" "/etc/init.d/file_sorting_service"
+sudo cp <ENTER PATH OF "file_sorting_service" FILE> "/etc/init.d/file_sorting_service"
 
-sudo cp "/home/ubuntu/python_files/update_candidate_info_service" "/etc/init.d/update_candidate_info_service"
+sudo cp <ENTER PATH OF "update_candidate_info_service" FILE> "/etc/init.d/update_candidate_info_service"
 
 
 sudo chmod +x /etc/init.d/file_sorting_service
