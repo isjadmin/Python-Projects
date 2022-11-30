@@ -492,8 +492,8 @@ def resume_download(resume_link_list):
 
 def main():
     reading_config_file()
-    try:
-        while True:
+    while True:
+        try:
             connection = create_server_connection()
 
             query = f'''
@@ -540,9 +540,9 @@ def main():
             else:
                 logging.info("No new file to update")
             connection.close()
-            time.sleep(30)
-    except Exception as e:
-        logging.exception(f"error in main method {e}")
+        except Exception as e:
+            logging.exception(f"error in main method {e}")
+        time.sleep(30)
 
 
 if __name__ == "__main__":
