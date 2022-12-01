@@ -1,6 +1,9 @@
 pip3 install -r requirement.txt
 
 
+Edit the "config.json" file with appropriate details
+
+
 Cross verify "directory" path in line no. 11 in both 1."file_sorting_service", 2."update_candidate_info_service" files
 
 
