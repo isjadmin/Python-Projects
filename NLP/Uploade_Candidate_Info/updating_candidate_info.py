@@ -111,7 +111,7 @@ class CsvFileValidation:
                     if len(col) > 0:
                         print(col)
                         created_time = col
-                        created_time = datetime.strptime(created_time, '%Y, %m, %d, %H, %M, %S')
+                        created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M:%S')
                         candidate_detail_list.append(created_time)
                     else:
                         candidate_detail_list.append('0')

@@ -107,13 +107,9 @@ class CsvFileValidation:
                         remark += "Invalid Email-ID, "
                 if self.fields[count] == FIELD_NAMES[3]:
                     try:
-                        date_time = col.split(',')
-                        for i in range(len(date_time)):
-                            date_time[i] = int(date_time[i])
+                        date_time = datetime.strptime(col, '%d-%b-%Y %H:%M:%S')
                         print(date_time)
-                        print(datetime.strftime(datetime(date_time[0], date_time[1], date_time[2], date_time[3],
-                                                         date_time[4], date_time[5]),
-                                                '%Y, %m, %d, %H, %M, %S'))
+                        print(type(date_time))
                     except Exception as e:
                         logging.exception(f"{e}")
                         csv_success_flag = False
