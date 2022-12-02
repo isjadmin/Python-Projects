@@ -27,6 +27,7 @@ TABLE_NAME = "upload"
 TABLE_COLUMN_ID = "id"
 TABLE_COLUMN_PATH = "path"
 TABLE_COLUMN_PROCESS_STATE = "processed_state"
+TABLE_COLUMN_JOB_ID = "job_id"
 
 CANDIDATE_TABLE_NAME = "candidate"
 CANDIDATE_TABLE_FIRST_NAME = "FirstName"
@@ -47,6 +48,15 @@ CANDIDATE_TABLE_COLUMN_RESUME_PARSED = "ResumeParsed"
 CANDIDATE_SKILL_TABLE_NAME = "candidateskill"
 CANDIDATE_SKILL_TABLE_CANDIDATE_ID = "CandidateId"
 CANDIDATE_SKILL_TABLE_SKILL_ID = "SkillId"
+
+CANDIDATE_JOB_SKILL_TABLE_NAME = "candidatejobskill"
+CANDIDATE_JOB_SKILL_TABLE_ID = "Id"
+CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_ID = "CandidateId"
+CANDIDATE_JOB_SKILL_TABLE_JOB_ID = "JobId"
+CANDIDATE_JOB_SKILL_TABLE_LAST_UPDATED_TIME = "LastUpdatedTime"
+CANDIDATE_JOB_SKILL_TABLE_CREATED_TIME = "CreatedTime"
+CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED = "CandidateIntrested"
+CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED = "EmployerIntrested"
 
 
 ########################################################################################################################
@@ -103,13 +113,11 @@ class CsvFileValidation:
                         resume_link_list.append('0')
                 if self.fields[count] == FIELD_NAMES[2]:
                     if len(col) > 0:
-                        print(col)
                         candidate_detail_list.append(col)
                     else:
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[3]:
                     if len(col) > 0:
-                        print(col)
                         created_time = col
                         created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M:%S')
                         candidate_detail_list.append(created_time)
@@ -117,13 +125,11 @@ class CsvFileValidation:
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[6]:
                     if len(col) > 0:
-                        print(col)
                         candidate_detail_list.append(int(col))
                     else:
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[7]:
                     if len(col) > 0:
-                        print(col)
                         candidate_detail_list.append(float(col))
                     else:
                         candidate_detail_list.append('0')
@@ -134,7 +140,6 @@ class CsvFileValidation:
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[10]:
                     if len(col) > 0:
-                        print(col)
                         skill_id_list.append(int(col))
                     else:
                         skill_id_list.append('0')
@@ -206,16 +211,13 @@ class ExcelFileValidation:
             skill_id_list = []
             resume_link_list = []
             for i in range(1, self.column + 1):
-                # print(sheet_obj.cell(row=j, column=i).value)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[0]:
-                    # print('name: ', type(sheet_obj.cell(row=j, column=i).value))
                     name = self.sheet_obj.cell(row=j, column=i).value
                     if name is None or type(name) != str:
                         candidate_detail_list.append('0')
                     else:
                         candidate_detail_list.append(name)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[1]:
-                    # print('mob no: ', type(sheet_obj.cell(row=j, column=i).value))
                     mob_no = self.sheet_obj.cell(row=j, column=i).value
                     if mob_no is None or type(mob_no) != int or len(str(mob_no)) < 10:
                         candidate_detail_list.append('0')
@@ -225,14 +227,12 @@ class ExcelFileValidation:
                         skill_id_list.append(mob_no)
                         resume_link_list.append(mob_no)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[2]:
-                    # print('email: ', type(sheet_obj.cell(row=j, column=i).value))
                     email_id = self.sheet_obj.cell(row=j, column=i).value
                     if email_id is None:
                         candidate_detail_list.append('0')
                     else:
                         candidate_detail_list.append(email_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[3]:
-                    # print('email: ', type(sheet_obj.cell(row=j, column=i).value))
                     created_time = self.sheet_obj.cell(row=j, column=i).value
                     if created_time is None:
                         candidate_detail_list.append('0')
@@ -240,21 +240,18 @@ class ExcelFileValidation:
                         created_time = created_time.strftime('%Y-%m-%d %H:%M:%S')
                         candidate_detail_list.append(created_time)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[6]:
-                    # print('notice period: ', type(sheet_obj.cell(row=j, column=i).value))
                     notice_period = self.sheet_obj.cell(row=j, column=i).value
                     if notice_period is None or (type(notice_period) != float and type(notice_period) != int):
                         candidate_detail_list.append('0')
                     else:
                         candidate_detail_list.append(notice_period)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[7]:
-                    # print('current ctc: ', type(sheet_obj.cell(row=j, column=i).value))
                     current_ctc = self.sheet_obj.cell(row=j, column=i).value
                     if current_ctc is None or (type(current_ctc) != float and type(current_ctc) != int):
                         candidate_detail_list.append('0')
                     else:
                         candidate_detail_list.append(current_ctc)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[8]:
-                    # print('expected ctc: ', type(sheet_obj.cell(row=j, column=i).value))
                     expected_ctc = self.sheet_obj.cell(row=j, column=i).value
                     if expected_ctc is None or (type(expected_ctc) != float and type(expected_ctc) != int):
                         candidate_detail_list.append('0')
@@ -281,8 +278,7 @@ class ExcelFileValidation:
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[16]:
                     url = self.sheet_obj.cell(row=j, column=i).value
                     if url is None:
-                        print("URL not given")
-                        # skill_id_list.append('0')
+                        logging.warning("URL not given")
                     else:
                         resume_link_list.append(url)
 
@@ -319,9 +315,9 @@ def create_server_connection():
             passwd=PASSWORD,
             database=DB_NAME
         )
-        print("Connection Successful")
+        logging.info("Connection Successful")
     except Error as err:
-        print(f"Error: {err}")
+        logging.error(f"Error: {err}")
     return connect
 
 
@@ -330,10 +326,10 @@ def execute_query(connect, query):
     try:
         cursor.execute(query)
         connect.commit()
-        print("Query Execute Successfully")
+        logging.info("Query Execute Successfully")
         return True
     except Error as err:
-        print(f"Error : {err}")
+        logging.error(f"Error : {err}")
         return False
 
 
@@ -345,7 +341,7 @@ def read_query(connect, query):
         result = cursor.fetchall()
 
     except Error as err:
-        print(f"Error: {err}")
+        logging.error(f"Error: {err}")
     return result
 
 
@@ -357,10 +353,7 @@ def update_candidate_table(candidate_details):
             query = f'''select {CANDIDATE_TABLE_COLUMN_ID}, {CANDIDATE_TABLE_COLUMN_EMAIL_ID} 
             From {CANDIDATE_TABLE_NAME} where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {detail[1]}'''
 
-            print(detail[2])
-
             detail_result = read_query(connection, query)
-            print(detail_result)
 
             if detail_result is not None and len(detail_result) > 0:
                 update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_CCTC}` = {detail[5]}, 
@@ -369,7 +362,7 @@ def update_candidate_table(candidate_details):
                 WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0][0]});'''
 
                 execution_flag = execute_query(connection, update_query)
-                print(execution_flag)
+
                 email_update_flag = False
                 if detail_result[0][1] != detail[2]:
                     update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET
@@ -377,7 +370,6 @@ def update_candidate_table(candidate_details):
                     WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0][0]});'''
 
                     email_update_flag = execute_query(connection, update_query)
-                print(email_update_flag)
 
             else:
                 detail[3] = detail[3].strftime('%Y-%m-%d %H:%M:%S')
@@ -399,7 +391,7 @@ def update_candidate_table(candidate_details):
         return False
 
 
-def candidate_skill_table_update(candidate_skills):
+def candidate_skill_table_update(candidate_skills, job_id):
     execution_flag = False
     connection = create_server_connection()
     for candidate_skill in candidate_skills:
@@ -408,7 +400,6 @@ def candidate_skill_table_update(candidate_skills):
         id_result = read_query(connection, id_query)
 
         if id_result is not None and len(id_result) > 0:
-            print(id_result[0])
             for skill in candidate_skill[1:]:
                 skill_check_query = f'''select * from {CANDIDATE_SKILL_TABLE_NAME} 
                 where {CANDIDATE_SKILL_TABLE_CANDIDATE_ID} = {int(id_result[0][0])} and 
@@ -418,13 +409,43 @@ def candidate_skill_table_update(candidate_skills):
 
                 if skill_check_result is not None and len(skill_check_result) > 0:
                     logging.info(f"Skill id {skill} already present for candidate id {int(id_result[0][0])}")
-                    print(f"Skill id {skill} already present for candidate id {int(id_result[0][0])}")
                 else:
                     skill_insert_query = f'''INSERT INTO {CANDIDATE_SKILL_TABLE_NAME} 
                     (`{CANDIDATE_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_SKILL_TABLE_SKILL_ID}`) 
                     VALUES ({int(id_result[0][0])}, {skill});'''
 
                     execution_flag = execute_query(connection, skill_insert_query)
+
+            cjs_check_query = f'''SELECT `{CANDIDATE_JOB_SKILL_TABLE_ID}` FROM {CANDIDATE_JOB_SKILL_TABLE_NAME} 
+                            WHERE (`{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_ID}` = {int(id_result[0][0])} and 
+                            `{CANDIDATE_JOB_SKILL_TABLE_JOB_ID}` = {job_id});'''
+
+            cjs_check_result = read_query(connection, cjs_check_query)
+
+            time_now = datetime.now()
+            time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
+
+            if cjs_check_result is not None and len(cjs_check_result) > 0:
+                logging.info(f"job id {job_id} already present for candidate id {int(id_result[0][0])}")
+
+                update_cjs_query = f'''UPDATE `{CANDIDATE_JOB_SKILL_TABLE_NAME}` 
+                                SET `{CANDIDATE_JOB_SKILL_TABLE_LAST_UPDATED_TIME}` = '{time_now}',
+                                `{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED}` = {0},
+                                `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}` = {0}
+                                WHERE (`{CANDIDATE_JOB_SKILL_TABLE_ID}` = {int(cjs_check_result[0][0])});'''
+
+                update_flag = execute_query(connection, update_cjs_query)
+
+            else:
+                insert_cjs_query = f'''INSERT INTO {CANDIDATE_JOB_SKILL_TABLE_NAME} 
+                                (`{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_JOB_SKILL_TABLE_JOB_ID}`, 
+                                `{CANDIDATE_JOB_SKILL_TABLE_CREATED_TIME}`, 
+                                `{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED}`,
+                                `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}`) 
+                                VALUES ({int(id_result[0][0])}, {job_id}, '{time_now}', {1}, {1});'''
+
+                insert_flag = execute_query(connection, insert_cjs_query)
+
         else:
             logging.warning("Invalid candidate Id")
     connection.close()
@@ -437,7 +458,6 @@ def resume_download(resume_link_list):
         try:
             os.mkdir(RESUME_DIRECTORY_PATH)
         except Exception as e:
-            print(e)
             logging.exception(f"Error creating parent directory {RESUME_DIRECTORY_PATH}: {e}")
             return
     connection = create_server_connection()
@@ -446,7 +466,6 @@ def resume_download(resume_link_list):
         where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {link_detail[0]}'''
 
         detail_result = read_query(connection, query)
-        print(detail_result)
 
         if detail_result is not None and len(detail_result) > 0:
             candidate_id = detail_result[0][0]
@@ -465,7 +484,6 @@ def resume_download(resume_link_list):
                     continue
 
             resume_path = current_resume_directory + "/"
-            print(resume_path)
             f = ""
             try:
                 f = gdown.download(url, quiet=False, fuzzy=True, output=resume_path)
@@ -500,41 +518,36 @@ def main():
             connection = create_server_connection()
 
             query = f'''
-            select {TABLE_COLUMN_ID}, {TABLE_COLUMN_PATH} From {TABLE_NAME} where {TABLE_COLUMN_PROCESS_STATE} = 1;
+            select {TABLE_COLUMN_ID}, {TABLE_COLUMN_PATH}, {TABLE_COLUMN_JOB_ID} From {TABLE_NAME} 
+            where {TABLE_COLUMN_PROCESS_STATE} = 1;
             '''
 
             query_results = read_query(connection, query)
-            print(query_results)
 
             if query_results is not None and len(query_results) > 0:
                 for result in query_results:
-                    # print(result)
-                    # print(type(result[1]))
                     row_id = result[0]
                     path = str(result[1])
+                    job_id = int(result[2])
+
                     candidate_details = []
                     candidate_skill_id = []
                     resume_link_list = []
+
                     if ".csv" in path:
                         path = path.removesuffix('.csv') + '-Success.csv'
                         csv_obj = CsvFileValidation(path)
                         candidate_details, candidate_skill_id, resume_link_list = csv_obj.csv_required_details()
-                        print(f"Candidate details from {path}: \n {candidate_details}")
-                        print(f"Candidate skill ids from {path}: \n {candidate_skill_id}")
                     elif ".xlsx" in path:
                         path = path.removesuffix('.xlsx') + '-Success.xlsx'
-                        print(path)
                         excel_obj = ExcelFileValidation(path)
                         candidate_details, candidate_skill_id, resume_link_list = excel_obj.excel_required_details()
-                        print(f"Candidate details from {path}: \n {candidate_details}")
-                        print(f"Candidate skill ids from {path}: \n {candidate_skill_id}")
                     else:
                         logging.warning(f"Given File Path for row-id {row_id} is invalid")
                     if len(candidate_details) > 0 and len(candidate_skill_id) > 0:
                         update_table_flag = update_candidate_table(candidate_details)
                         if update_table_flag:
-                            candidate_skill_table_update(candidate_skill_id)
-                            print(resume_link_list)
+                            candidate_skill_table_update(candidate_skill_id, job_id)
                             resume_download(resume_link_list)
                             query = f'''UPDATE {TABLE_NAME}
                                         SET {TABLE_COLUMN_PROCESS_STATE} = 2

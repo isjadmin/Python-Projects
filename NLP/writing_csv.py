@@ -15,6 +15,27 @@ if str(d_type) == "<class 'datetime.datetime'>":
     print(True)
 else:
     print(False)
+
+
+print(str(type(2)))
+if str(type(2)) == "<class 'int'>":
+    print(True)
+else:
+    print(False)
+
+
+print(str(type(2.0)))
+if str(type(2.0)) == "<class 'float'>":
+    print(True)
+else:
+    print(False)
+
+
+dig = '22.1'
+print(dig)
+print(dig.isdigit())
+
+
 # data rows of csv file
 rows = [['abc', 1234567890, 'abc@gmail.com', '08-Jan-2022 9:30:00',
          55, 'www.abc.com', 2, 5, 7.5, 'C', 1, 'Python', 2, None, None],
