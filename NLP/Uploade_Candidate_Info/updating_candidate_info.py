@@ -430,8 +430,8 @@ def candidate_skill_table_update(candidate_skills, job_id):
 
                 update_cjs_query = f'''UPDATE `{CANDIDATE_JOB_SKILL_TABLE_NAME}` 
                                 SET `{CANDIDATE_JOB_SKILL_TABLE_LAST_UPDATED_TIME}` = '{time_now}',
-                                `{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED}` = {0},
-                                `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}` = {0}
+                                `{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED}` = {1},
+                                `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}` = {1}
                                 WHERE (`{CANDIDATE_JOB_SKILL_TABLE_ID}` = {int(cjs_check_result[0][0])});'''
 
                 update_flag = execute_query(connection, update_cjs_query)
