@@ -36,6 +36,17 @@ print(dig)
 print(dig.isdigit())
 
 
+test_list = {0: 10, 1: 11, 2: 12, 3: 13, 4: 14, 5: 15, 6: 16, 7: 17, 8: 18, 9: 19}
+for num in test_list:
+    print(test_list[num])
+    print(num)
+
+num = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+for i in range(0, 5, 2):
+    print("i:", i)
+    print("i+2:", i+2)
+    print(num[i+2])
+
 # data rows of csv file
 rows = [['abc', 1234567890, 'abc@gmail.com', '08-Jan-2022 9:30:00',
          55, 'www.abc.com', 2, 5, 7.5, 'C', 1, 'Python', 2, None, None],
@@ -58,7 +69,7 @@ rows = [['abc', 1234567890, 'abc@gmail.com', '08-Jan-2022 9:30:00',
          'https://docs.google.com/document/d/1T0433HfRFYlfZaEoTBRazhREwuVcXh6H/edit?usp=share_link&ouid=104676003970984958117&rtpof=true&sd=true',
          None, 20, 22.5, 'C', 6, 'Python', 7, 'Java', 4]]
 
-# name of csv file
+'''# name of csv file
 filename = "D:\\Python-Projects\\NLP\\File-validation\\Book1.csv"
 
 # writing to csv file
@@ -70,4 +81,4 @@ with open(filename, 'w') as csvfile:
     csvwriter.writerow(fields)
 
     # writing the data rows
-    csvwriter.writerows(rows)
+    csvwriter.writerows(rows)'''

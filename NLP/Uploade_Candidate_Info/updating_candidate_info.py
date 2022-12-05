@@ -48,6 +48,8 @@ CANDIDATE_TABLE_COLUMN_RESUME_PARSED = "ResumeParsed"
 CANDIDATE_SKILL_TABLE_NAME = "candidateskill"
 CANDIDATE_SKILL_TABLE_CANDIDATE_ID = "CandidateId"
 CANDIDATE_SKILL_TABLE_SKILL_ID = "SkillId"
+CANDIDATE_SKILL_TABLE_EXPERIENCE = "Experience"
+CANDIDATE_SKILL_TABLE_ID = "Id"
 
 CANDIDATE_JOB_SKILL_TABLE_NAME = "candidatejobskill"
 CANDIDATE_JOB_SKILL_TABLE_ID = "Id"
@@ -57,6 +59,7 @@ CANDIDATE_JOB_SKILL_TABLE_LAST_UPDATED_TIME = "LastUpdatedTime"
 CANDIDATE_JOB_SKILL_TABLE_CREATED_TIME = "CreatedTime"
 CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED = "CandidateIntrested"
 CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED = "EmployerIntrested"
+CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE = "TotalScore"
 
 
 ########################################################################################################################
@@ -97,12 +100,12 @@ class CsvFileValidation:
             if len(row) == 0:
                 continue
             for col in row:
-                if self.fields[count] == FIELD_NAMES[0]:
+                if self.fields[count] == FIELD_NAMES[0]:  # Name
                     if len(col) > 0:
                         candidate_detail_list.append(col)
                     else:
                         candidate_detail_list.append('0')
-                if self.fields[count] == FIELD_NAMES[1]:
+                if self.fields[count] == FIELD_NAMES[1]:  # Mob No
                     if len(col) > 0:
                         candidate_detail_list.append(int(col))
                         skill_id_list.append(int(col))
@@ -111,49 +114,69 @@ class CsvFileValidation:
                         candidate_detail_list.append('0')
                         skill_id_list.append('0')
                         resume_link_list.append('0')
-                if self.fields[count] == FIELD_NAMES[2]:
+                if self.fields[count] == FIELD_NAMES[2]:  # Email Id
                     if len(col) > 0:
                         candidate_detail_list.append(col)
                     else:
                         candidate_detail_list.append('0')
-                if self.fields[count] == FIELD_NAMES[3]:
+                if self.fields[count] == FIELD_NAMES[3]:  # Created time
                     if len(col) > 0:
                         created_time = col
                         created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M:%S')
                         candidate_detail_list.append(created_time)
                     else:
                         candidate_detail_list.append('0')
-                if self.fields[count] == FIELD_NAMES[6]:
+                if self.fields[count] == FIELD_NAMES[4]:  # Test Score
                     if len(col) > 0:
-                        candidate_detail_list.append(int(col))
+                        skill_id_list.append(float(col))
                     else:
-                        candidate_detail_list.append('0')
-                if self.fields[count] == FIELD_NAMES[7]:
+                        skill_id_list.append('0')
+                if self.fields[count] == FIELD_NAMES[6]:  # Notice Period
                     if len(col) > 0:
                         candidate_detail_list.append(float(col))
                     else:
                         candidate_detail_list.append('0')
-                if self.fields[count] == FIELD_NAMES[8]:
+                if self.fields[count] == FIELD_NAMES[7]:  # Current CTC
                     if len(col) > 0:
                         candidate_detail_list.append(float(col))
                     else:
                         candidate_detail_list.append('0')
-                if self.fields[count] == FIELD_NAMES[10]:
+                if self.fields[count] == FIELD_NAMES[8]:  # Expected CTC
+                    if len(col) > 0:
+                        candidate_detail_list.append(float(col))
+                    else:
+                        candidate_detail_list.append('0')
+                if self.fields[count] == FIELD_NAMES[10]:  # Skill1 ID
                     if len(col) > 0:
                         skill_id_list.append(int(col))
                     else:
                         skill_id_list.append('0')
-                if self.fields[count] == FIELD_NAMES[13]:
+                if self.fields[count] == FIELD_NAMES[11]:  # Skill1 Years
+                    if len(col) > 0:
+                        skill_id_list.append(float(col))
+                    else:
+                        skill_id_list.append('0')
+                if self.fields[count] == FIELD_NAMES[13]:  # Skill2 ID
                     if len(col) > 0:
                         skill_id_list.append(int(col))
                     else:
                         skill_id_list.append('0')
-                if self.fields[count] == FIELD_NAMES[16]:
+                if self.fields[count] == FIELD_NAMES[14]:  # Skill2 Years
+                    if len(col) > 0:
+                        skill_id_list.append(float(col))
+                    else:
+                        skill_id_list.append('0')
+                if self.fields[count] == FIELD_NAMES[16]:  # Skill3 ID
                     if len(col) > 0:
                         skill_id_list.append(int(col))
                     else:
                         skill_id_list.append('0')
-                if self.fields[count] == FIELD_NAMES[5]:
+                if self.fields[count] == FIELD_NAMES[17]:  # Skill3 Years
+                    if len(col) > 0:
+                        skill_id_list.append(float(col))
+                    else:
+                        skill_id_list.append('0')
+                if self.fields[count] == FIELD_NAMES[5]:  # Resume Link
                     if len(col) > 0:
                         resume_link_list.append(col)
                     else:
@@ -239,6 +262,12 @@ class ExcelFileValidation:
                     else:
                         created_time = created_time.strftime('%Y-%m-%d %H:%M:%S')
                         candidate_detail_list.append(created_time)
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[4]:
+                    test_score = self.sheet_obj.cell(row=j, column=i).value
+                    if test_score is None or (type(test_score) != float and type(test_score) != int):
+                        skill_id_list.append('0')
+                    else:
+                        skill_id_list.append(test_score)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[6]:
                     notice_period = self.sheet_obj.cell(row=j, column=i).value
                     if notice_period is None or (type(notice_period) != float and type(notice_period) != int):
@@ -263,19 +292,37 @@ class ExcelFileValidation:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill1_id)
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[11]:
+                    skill1_year = self.sheet_obj.cell(row=j, column=i).value
+                    if skill1_year is None:
+                        skill_id_list.append('0')
+                    else:
+                        skill_id_list.append(skill1_year)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[13]:
                     skill2_id = self.sheet_obj.cell(row=j, column=i).value
                     if skill2_id is None:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill2_id)
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[14]:
+                    skill2_year = self.sheet_obj.cell(row=j, column=i).value
+                    if skill2_year is None:
+                        skill_id_list.append('0')
+                    else:
+                        skill_id_list.append(skill2_year)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[16]:
                     skill3_id = self.sheet_obj.cell(row=j, column=i).value
                     if skill3_id is None:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill3_id)
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[16]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[17]:
+                    skill3_year = self.sheet_obj.cell(row=j, column=i).value
+                    if skill3_year is None:
+                        skill_id_list.append('0')
+                    else:
+                        skill_id_list.append(skill3_year)
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[5]:
                     url = self.sheet_obj.cell(row=j, column=i).value
                     if url is None:
                         logging.warning("URL not given")
@@ -392,6 +439,9 @@ def update_candidate_table(candidate_details):
 
 
 def candidate_skill_table_update(candidate_skills, job_id):
+    print(candidate_skills)
+    # candidate_skills = [0:mob no, 1:test_score, 2:skill1_id, 3:skill1_year,
+    # 4:skill2_id, 5:skill2_year, 6:skill3_id, 7:skill3_year,]
     execution_flag = False
     connection = create_server_connection()
     for candidate_skill in candidate_skills:
@@ -400,19 +450,28 @@ def candidate_skill_table_update(candidate_skills, job_id):
         id_result = read_query(connection, id_query)
 
         if id_result is not None and len(id_result) > 0:
-            for skill in candidate_skill[1:]:
-                skill_check_query = f'''select * from {CANDIDATE_SKILL_TABLE_NAME} 
+            for i in range(0, 5, 2):
+                skill_check_query = f'''select {CANDIDATE_SKILL_TABLE_ID} from {CANDIDATE_SKILL_TABLE_NAME} 
                 where {CANDIDATE_SKILL_TABLE_CANDIDATE_ID} = {int(id_result[0][0])} and 
-                {CANDIDATE_SKILL_TABLE_SKILL_ID} = {skill}'''
+                {CANDIDATE_SKILL_TABLE_SKILL_ID} = {candidate_skill[i+2]}'''
 
                 skill_check_result = read_query(connection, skill_check_query)
 
                 if skill_check_result is not None and len(skill_check_result) > 0:
-                    logging.info(f"Skill id {skill} already present for candidate id {int(id_result[0][0])}")
+                    logging.info(f"Skill id {candidate_skill[i+2]} \
+                    already present for candidate id {int(id_result[0][0])}")
+
+                    skill_update_query = f'''UPDATE `{CANDIDATE_SKILL_TABLE_NAME}` 
+                    SET `{CANDIDATE_SKILL_TABLE_EXPERIENCE}` = {candidate_skill[i+3]}
+                    WHERE ({CANDIDATE_JOB_SKILL_TABLE_ID} = {int(skill_check_result[0][0])});'''
+
+                    skill_update_flag = execute_query(connection, skill_update_query)
+
                 else:
                     skill_insert_query = f'''INSERT INTO {CANDIDATE_SKILL_TABLE_NAME} 
-                    (`{CANDIDATE_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_SKILL_TABLE_SKILL_ID}`) 
-                    VALUES ({int(id_result[0][0])}, {skill});'''
+                    (`{CANDIDATE_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_SKILL_TABLE_SKILL_ID}`, 
+                    `{CANDIDATE_SKILL_TABLE_EXPERIENCE}`) 
+                    VALUES ({int(id_result[0][0])}, {candidate_skill[i+2]}, {candidate_skill[i+3]});'''
 
                     execution_flag = execute_query(connection, skill_insert_query)
 
@@ -431,7 +490,8 @@ def candidate_skill_table_update(candidate_skills, job_id):
                 update_cjs_query = f'''UPDATE `{CANDIDATE_JOB_SKILL_TABLE_NAME}` 
                                 SET `{CANDIDATE_JOB_SKILL_TABLE_LAST_UPDATED_TIME}` = '{time_now}',
                                 `{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED}` = {1},
-                                `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}` = {1}
+                                `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}` = {1},
+                                `{CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE}` = {candidate_skill[1]}
                                 WHERE (`{CANDIDATE_JOB_SKILL_TABLE_ID}` = {int(cjs_check_result[0][0])});'''
 
                 update_flag = execute_query(connection, update_cjs_query)
@@ -441,8 +501,10 @@ def candidate_skill_table_update(candidate_skills, job_id):
                                 (`{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_JOB_SKILL_TABLE_JOB_ID}`, 
                                 `{CANDIDATE_JOB_SKILL_TABLE_CREATED_TIME}`, 
                                 `{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED}`,
-                                `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}`) 
-                                VALUES ({int(id_result[0][0])}, {job_id}, '{time_now}', {1}, {1});'''
+                                `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}`,
+                                `{CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE}`) 
+                                VALUES ({int(id_result[0][0])}, {job_id}, '{time_now}', 
+                                {1}, {1}, {candidate_skill[1]});'''
 
                 insert_flag = execute_query(connection, insert_cjs_query)
 
