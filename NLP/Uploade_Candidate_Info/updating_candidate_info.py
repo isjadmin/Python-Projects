@@ -40,6 +40,7 @@ CANDIDATE_TABLE_COLUMN_ECTC = "ECTC"
 CANDIDATE_TABLE_COLUMN_EMAIL_ID = "EmailId"
 CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD = "NoticePeriod"
 CANDIDATE_TABLE_COLUMN_CREATED_TIME = "CreatedTime"
+CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME = "LastUpdatedTime"
 
 CANDIDATE_TABLE_COLUMN_RESUME_TYPE = "ResumeType"
 CANDIDATE_TABLE_COLUMN_RESUME_ID = "ResumeId"
@@ -416,10 +417,14 @@ def update_candidate_table(candidate_details):
 
             detail_result = read_query(connection, query)
 
+            time_now = datetime.now()
+            time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
+
             if detail_result is not None and len(detail_result) > 0:
                 update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_CCTC}` = {detail[6]}, 
                 `{CANDIDATE_TABLE_COLUMN_ECTC}` = {detail[7]}, `{CANDIDATE_TABLE_FIRST_NAME}` = '{detail[0]}', 
-                `{CANDIDATE_TABLE_LAST_NAME}` = '{detail[1]}', `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}` = {detail[5]} 
+                `{CANDIDATE_TABLE_LAST_NAME}` = '{detail[1]}', `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}` = {detail[5]},
+                `{CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME}` = '{time_now}'
                 WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0][0]});'''
 
                 execution_flag = execute_query(connection, update_query)
@@ -439,9 +444,10 @@ def update_candidate_table(candidate_details):
                 insert_query = f'''INSERT INTO {CANDIDATE_TABLE_NAME} (`{CANDIDATE_TABLE_COLUMN_CCTC}`, 
                 `{CANDIDATE_TABLE_COLUMN_ECTC}`, `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}`, `{CANDIDATE_TABLE_FIRST_NAME}`, 
                 `{CANDIDATE_TABLE_LAST_NAME}`, `{CANDIDATE_TABLE_COLUMN_MOB_NO}`, `{CANDIDATE_TABLE_DISPLAY_NAME}`,
-                `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}`, `{CANDIDATE_TABLE_COLUMN_CREATED_TIME}`) 
+                `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}`, `{CANDIDATE_TABLE_COLUMN_CREATED_TIME}`,
+                `{CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME}`) 
                 VALUES ({detail[6]}, {detail[7]}, '{detail[3]}', '{detail[0]}', '{detail[1]}', {detail[2]}, 
-                '{display_name}', {detail[5]}, '{detail[4]}');'''
+                '{display_name}', {detail[5]}, '{detail[4]}', '{time_now}');'''
 
                 execution_flag = execute_query(connection, insert_query)
 
