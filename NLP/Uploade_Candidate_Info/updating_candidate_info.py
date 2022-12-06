@@ -32,6 +32,7 @@ TABLE_COLUMN_JOB_ID = "job_id"
 CANDIDATE_TABLE_NAME = "candidate"
 CANDIDATE_TABLE_FIRST_NAME = "FirstName"
 CANDIDATE_TABLE_LAST_NAME = "LastName"
+CANDIDATE_TABLE_DISPLAY_NAME = "DisplayName"
 CANDIDATE_TABLE_COLUMN_ID = "Id"
 CANDIDATE_TABLE_COLUMN_MOB_NO = "Mobile"
 CANDIDATE_TABLE_COLUMN_CCTC = "CTC"
@@ -432,13 +433,15 @@ def update_candidate_table(candidate_details):
                     email_update_flag = execute_query(connection, update_query)
 
             else:
+                milliseconds = int(time.time() * 1000)
+                display_name = detail[0] + detail[1] + milliseconds
                 detail[4] = detail[4].strftime('%Y-%m-%d %H:%M:%S')
                 insert_query = f'''INSERT INTO {CANDIDATE_TABLE_NAME} (`{CANDIDATE_TABLE_COLUMN_CCTC}`, 
                 `{CANDIDATE_TABLE_COLUMN_ECTC}`, `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}`, `{CANDIDATE_TABLE_FIRST_NAME}`, 
                 `{CANDIDATE_TABLE_COLUMN_MOB_NO}`, `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}`, 
-                `{CANDIDATE_TABLE_LAST_NAME}`, `{CANDIDATE_TABLE_COLUMN_CREATED_TIME}`) 
+                `{CANDIDATE_TABLE_LAST_NAME}`, `{CANDIDATE_TABLE_COLUMN_CREATED_TIME}`, `{CANDIDATE_TABLE_DISPLAY_NAME}`) 
                 VALUES ({detail[6]}, {detail[7]}, '{detail[3]}', '{detail[0]}', '{detail[1]}', {detail[2]}, 
-                {detail[5]}, '{detail[4]}');'''
+                {detail[5]}, '{detail[4]}', '{display_name}');'''
 
                 execution_flag = execute_query(connection, insert_query)
 
