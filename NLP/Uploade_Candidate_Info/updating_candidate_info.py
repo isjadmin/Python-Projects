@@ -274,7 +274,7 @@ class ExcelFileValidation:
                     if created_time is None:
                         candidate_detail_list.append('0')
                     else:
-                        created_time = created_time.strptime('%Y-%m-%d %H:%M:%S')
+                        created_time = created_time.strptime(str(created_time), '%Y-%m-%d %H:%M:%S')
                         candidate_detail_list.append(created_time)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[5]:
                     test_score = self.sheet_obj.cell(row=j, column=i).value
@@ -434,14 +434,14 @@ def update_candidate_table(candidate_details):
 
             else:
                 milliseconds = int(time.time() * 1000)
-                display_name = detail[0] + detail[1] + milliseconds
+                display_name = detail[0] + detail[1] + str(milliseconds)
                 detail[4] = detail[4].strftime('%Y-%m-%d %H:%M:%S')
                 insert_query = f'''INSERT INTO {CANDIDATE_TABLE_NAME} (`{CANDIDATE_TABLE_COLUMN_CCTC}`, 
                 `{CANDIDATE_TABLE_COLUMN_ECTC}`, `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}`, `{CANDIDATE_TABLE_FIRST_NAME}`, 
-                `{CANDIDATE_TABLE_COLUMN_MOB_NO}`, `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}`, 
-                `{CANDIDATE_TABLE_LAST_NAME}`, `{CANDIDATE_TABLE_COLUMN_CREATED_TIME}`, `{CANDIDATE_TABLE_DISPLAY_NAME}`) 
+                `{CANDIDATE_TABLE_LAST_NAME}`, `{CANDIDATE_TABLE_COLUMN_MOB_NO}`, `{CANDIDATE_TABLE_DISPLAY_NAME}`,
+                `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}`, `{CANDIDATE_TABLE_COLUMN_CREATED_TIME}`) 
                 VALUES ({detail[6]}, {detail[7]}, '{detail[3]}', '{detail[0]}', '{detail[1]}', {detail[2]}, 
-                {detail[5]}, '{detail[4]}', '{display_name}');'''
+                '{display_name}', {detail[5]}, '{detail[4]}');'''
 
                 execution_flag = execute_query(connection, insert_query)
 
@@ -541,6 +541,7 @@ def resume_download(resume_link_list):
             return
     connection = create_server_connection()
     for link_detail in resume_link_list:
+        print(link_detail)
         query = f'''select {CANDIDATE_TABLE_COLUMN_ID} From {CANDIDATE_TABLE_NAME} 
         where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {link_detail[0]}'''
 
