@@ -11,9 +11,9 @@ import json
 import time
 
 
-FIELD_NAMES = ['name', 'mob no', 'email', 'created time', 'testscore', 'linked resume', 'notice period',
-               'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2', 'skill2 ID',
-               'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']
+FIELD_NAMES = ['first name', 'last name', 'mob no', 'email', 'created time', 'test score', 'linked resume',
+               'notice period', 'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2',
+               'skill2 ID', 'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']
 
 CONFIG_FILE_PATH = "config.json"
 
@@ -29,6 +29,15 @@ TABLE_COLUMN_PROCESS_STATE = "processed_state"
 TABLE_COLUMN_FILE_UPDATE_TIME = "file_update_time"
 TABLE_COLUMN_JOB_ID = "job_id"
 
+TABLE_JOB_SKILL_NAME = "jobskill"
+TABLE_JOB_SKILL_JOB_ID = "JobId"
+TABLE_JOB_SKILL_SKILL_NAME = "SkillName"
+TABLE_JOB_SKILL_SKILL_ID = "SkillId"
+
+TABLE_SKILL_NAME = "skills"
+TABLE_SKILL_TITLE = "Title"
+TABLE_SKILL_ID = "Id"
+
 
 ########################################################################################################################
 class CsvFileValidation:
@@ -38,8 +47,8 @@ class CsvFileValidation:
         self.fields = []
         self.csv_success_row_list = []
         self.csv_error_row_list = []
-        self.csv_success_file_name = self.path.removesuffix('.csv') + '-Success.csv'
-        self.csv_error_file_name = self.path.removesuffix('.csv') + '-Error.csv'
+        self.csv_success_file_name = self.path.replace('.csv', '-Success.csv')
+        self.csv_error_file_name = self.path.replace('.csv', '-Error.csv')
         self.job_skills = job_skills
 
         self.connection = create_server_connection()
@@ -81,8 +90,14 @@ class CsvFileValidation:
                         pass
                     else:
                         csv_success_flag = False
-                        remark += "Invalid Name, "
+                        remark += "Invalid First Name, "
                 if self.fields[count] == FIELD_NAMES[1]:
+                    if len(col) > 0:
+                        pass
+                    else:
+                        csv_success_flag = False
+                        remark += "Invalid Last Name, "
+                if self.fields[count] == FIELD_NAMES[2]:
                     try:
                         if len(col) < 10:
                             csv_success_flag = False
@@ -93,13 +108,13 @@ class CsvFileValidation:
                         logging.exception(f"{e}")
                         csv_success_flag = False
                         remark += "Invalid Mobile No., "
-                if self.fields[count] == FIELD_NAMES[2]:
+                if self.fields[count] == FIELD_NAMES[3]:
                     if email_validation(col):
                         pass
                     else:
                         csv_success_flag = False
                         remark += "Invalid Email-ID, "
-                if self.fields[count] == FIELD_NAMES[3]:
+                if self.fields[count] == FIELD_NAMES[4]:
                     try:
                         date_time = datetime.strptime(col, '%d-%b-%Y %H:%M:%S')
                         if str(type(date_time)) == "<class 'datetime.datetime'>":
@@ -111,7 +126,7 @@ class CsvFileValidation:
                         logging.exception(f"{e}")
                         csv_success_flag = False
                         remark += "Invalid Created Date, "
-                if self.fields[count] == FIELD_NAMES[4]:
+                if self.fields[count] == FIELD_NAMES[5]:
                     try:
                         if '.' in col:
                             test_score = float(col)
@@ -126,12 +141,12 @@ class CsvFileValidation:
                     except Exception as e:
                         logging.exception(f"{e}")
                         remark += "Invalid Test Score, "
-                if self.fields[count] == FIELD_NAMES[5]:
+                if self.fields[count] == FIELD_NAMES[6]:
                     if len(col) > 0:
                         pass
                     else:
                         remark += "incorrect resume link"
-                if self.fields[count] == FIELD_NAMES[6]:
+                if self.fields[count] == FIELD_NAMES[7]:
                     try:
                         if '.' in col:
                             notice_period = float(col)
@@ -146,7 +161,7 @@ class CsvFileValidation:
                     except Exception as e:
                         logging.exception(f"{e}")
                         remark += "Invalid Notice Period, "
-                if self.fields[count] == FIELD_NAMES[7]:
+                if self.fields[count] == FIELD_NAMES[8]:
                     try:
                         if '.' in col:
                             c_ctc = float(col)
@@ -161,7 +176,7 @@ class CsvFileValidation:
                     except Exception as e:
                         logging.exception(f"{e}")
                         remark += "Invalid Current CTC, "
-                if self.fields[count] == FIELD_NAMES[8]:
+                if self.fields[count] == FIELD_NAMES[9]:
                     try:
                         if '.' in col:
                             e_ctc = float(col)
@@ -176,9 +191,10 @@ class CsvFileValidation:
                     except Exception as e:
                         logging.exception(f"{e}")
                         remark += "Invalid Excepted CTC, "
-                if self.fields[count] == FIELD_NAMES[9]:
+                if self.fields[count] == FIELD_NAMES[10]:
                     if len(col) > 0:
-                        query = f""" SELECT Id FROM skills WHERE Title = '{col}'"""
+                        query = f""" SELECT {TABLE_SKILL_ID} FROM {TABLE_SKILL_NAME} 
+                        WHERE {TABLE_SKILL_TITLE} = '{col}'"""
                         skill_result = read_query(self.connection, query)
                         if len(skill_result) > 0 or skill_result is not None:
                             skill_list.append({str(col).upper(): int(skill_result[0][0])})
@@ -190,7 +206,7 @@ class CsvFileValidation:
                     else:
                         remark += "Invalid Skill1, "
                         skill1_id = None
-                if self.fields[count] == FIELD_NAMES[11]:
+                if self.fields[count] == FIELD_NAMES[12]:
                     try:
                         if '.' in col:
                             skill1_yr = float(col)
@@ -205,9 +221,10 @@ class CsvFileValidation:
                     except Exception as e:
                         logging.exception(f"{e}")
                         remark += "Invalid Skill1 Years, "
-                if self.fields[count] == FIELD_NAMES[12]:
+                if self.fields[count] == FIELD_NAMES[13]:
                     if len(col) > 0:
-                        query = f""" SELECT Id FROM skills WHERE Title = '{col}'"""
+                        query = f""" SELECT {TABLE_SKILL_ID} FROM {TABLE_SKILL_NAME} 
+                        WHERE {TABLE_SKILL_TITLE} = '{col}'"""
                         skill_result = read_query(self.connection, query)
                         if len(skill_result) > 0 or skill_result is not None:
                             skill_list.append({str(col).upper(): int(skill_result[0][0])})
@@ -219,7 +236,7 @@ class CsvFileValidation:
                     else:
                         remark += "Invalid Skill2, "
                         skill2_id = None
-                if self.fields[count] == FIELD_NAMES[14]:
+                if self.fields[count] == FIELD_NAMES[15]:
                     try:
                         if '.' in col:
                             skill2_yr = float(col)
@@ -234,9 +251,10 @@ class CsvFileValidation:
                     except Exception as e:
                         logging.exception(f"{e}")
                         remark += "Invalid Skill2 Years, "
-                if self.fields[count] == FIELD_NAMES[15]:
+                if self.fields[count] == FIELD_NAMES[16]:
                     if len(col) > 0:
-                        query = f""" SELECT Id FROM skills WHERE Title = '{col}'"""
+                        query = f""" SELECT {TABLE_SKILL_ID} FROM {TABLE_SKILL_NAME} 
+                        WHERE {TABLE_SKILL_TITLE} = '{col}'"""
                         skill_result = read_query(self.connection, query)
                         if len(skill_result) > 0 or skill_result is not None:
                             skill_list.append({str(col).upper(): int(skill_result[0][0])})
@@ -248,7 +266,7 @@ class CsvFileValidation:
                     else:
                         remark += "Invalid Skill3, "
                         skill3_id = None
-                if self.fields[count] == FIELD_NAMES[17]:
+                if self.fields[count] == FIELD_NAMES[18]:
                     try:
                         if '.' in col:
                             skill3_yr = float(col)
@@ -277,10 +295,10 @@ class CsvFileValidation:
                     csv_success_flag = False
                     remark += "Given Skills does not match with required job skills"
 
-            row.insert(10, skill1_id)
-            row.insert(13, skill2_id)
-            row.insert(16, skill3_id)
-            row.append(remark.removesuffix(', '))
+            row.insert(11, skill1_id)
+            row.insert(14, skill2_id)
+            row.insert(17, skill3_id)
+            row.append(remark)
             if csv_success_flag:
                 self.csv_success_row_list.append(row)
             else:
@@ -325,8 +343,8 @@ class ExcelFileValidation:
         self.excel_success_row_list.append(FIELD_NAMES)
         self.excel_error_row_list = []
         self.excel_error_row_list.append(FIELD_NAMES)
-        self.excel_success_file_name = self.path.removesuffix('.xlsx') + '-Success.xlsx'
-        self.excel_error_file_name = path.removesuffix('.xlsx') + '-Error.xlsx'
+        self.excel_success_file_name = self.path.replace('.xlsx', '-Success.xlsx')
+        self.excel_error_file_name = path.replace('.xlsx', '-Error.xlsx')
         self.job_skills = job_skills
 
         self.connection = create_server_connection()
@@ -357,62 +375,69 @@ class ExcelFileValidation:
             skill_list = []
             for i in range(1, self.column + 1):
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[0]:
-                    name = self.sheet_obj.cell(row=j, column=i).value
-                    row_list.append(name)
-                    if name is None or type(name) != str:
+                    first_name = self.sheet_obj.cell(row=j, column=i).value
+                    row_list.append(first_name)
+                    if first_name is None or type(first_name) != str:
                         success_flag = False
-                        remark += "Invalid name, "
+                        remark += "Invalid first name, "
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[1]:
+                    last_name = self.sheet_obj.cell(row=j, column=i).value
+                    row_list.append(last_name)
+                    if last_name is None or type(last_name) != str:
+                        success_flag = False
+                        remark += "Invalid last name, "
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[2]:
                     mob_no = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(mob_no)
                     if mob_no is None or type(mob_no) != int or len(str(mob_no)) < 10:
                         success_flag = False
                         remark += "Invalid Mob No., "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[2]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[3]:
                     email_id = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(email_id)
                     if email_id is None or email_validation(email_id) is False:
                         success_flag = False
                         remark += "Invalid Email-ID, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[3]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[4]:
                     created_time = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(created_time)
                     if created_time is None or type(created_time) != datetime:
                         success_flag = False
                         remark += "Invalid Created Time, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[4]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[5]:
                     test_score = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(test_score)
                     if test_score is None or (type(test_score) != float and type(test_score) != int):
                         remark += "Invalid Test Score, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[5]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[6]:
                     linked_resume = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(linked_resume)
                     if linked_resume is None or type(linked_resume) != str:
                         remark += "Invalid Linked Resume, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[6]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[7]:
                     notice_period = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(notice_period)
                     if notice_period is None or (type(notice_period) != float and type(notice_period) != int):
                         remark += "Invalid Notice Period, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[7]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[8]:
                     current_ctc = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(current_ctc)
                     if current_ctc is None or (type(current_ctc) != float and type(current_ctc) != int):
                         remark += "Invalid Current CTC, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[8]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[9]:
                     expected_ctc = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(expected_ctc)
                     if expected_ctc is None or (type(expected_ctc) != float and type(expected_ctc) != int):
                         remark += "Invalid Expected CTC, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[9]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[10]:
                     skill1 = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(skill1)
                     if skill1 is None or type(skill1) != str:
                         remark += "Invalid Skill1, "
                         row_list.append(None)
                     else:
-                        query = f""" SELECT Id FROM skills WHERE Title = '{skill1}'"""
+                        query = f""" SELECT {TABLE_SKILL_ID} FROM {TABLE_SKILL_NAME} 
+                        WHERE {TABLE_SKILL_TITLE} = '{skill1}'"""
                         skill_result = read_query(self.connection, query)
                         if len(skill_result) > 0:
                             skill_list.append({str(skill1).upper(): int(skill_result[0][0])})
@@ -421,19 +446,20 @@ class ExcelFileValidation:
                             row_list.append(None)
                             success_flag = False
                             remark += "Invalid Skill1, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[11]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[12]:
                     skill1_years = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(skill1_years)
                     if skill1_years is None or (type(skill1_years) != float and type(skill1_years) != int):
                         remark += "Invalid Skill1 Years, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[12]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[13]:
                     skill2 = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(skill2)
                     if skill2 is None or type(skill2) != str:
                         remark += "Invalid Skill2, "
                         row_list.append(None)
                     else:
-                        query = f""" SELECT Id FROM skills WHERE Title = '{skill2}'"""
+                        query = f""" SELECT {TABLE_SKILL_ID} FROM {TABLE_SKILL_NAME} 
+                        WHERE {TABLE_SKILL_TITLE} = '{skill2}'"""
                         skill_result = read_query(self.connection, query)
                         if len(skill_result) > 0:
                             skill_list.append({str(skill2).upper(): int(skill_result[0][0])})
@@ -442,19 +468,20 @@ class ExcelFileValidation:
                             row_list.append(None)
                             success_flag = False
                             remark += "Invalid Skill2, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[14]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[15]:
                     skill2_years = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(skill2_years)
                     if skill2_years is None or (type(skill2_years) != float and type(skill2_years) != int):
                         remark += "Invalid Skill2 Years, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[15]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[16]:
                     skill3 = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(skill3)
                     if skill3 is None or type(skill3) != str:
                         remark += "Invalid Skill3, "
                         row_list.append(None)
                     else:
-                        query = f""" SELECT Id FROM skills WHERE Title = '{skill3}'"""
+                        query = f""" SELECT {TABLE_SKILL_ID} FROM {TABLE_SKILL_NAME} 
+                        WHERE {TABLE_SKILL_TITLE} = '{skill3}'"""
                         skill_result = read_query(self.connection, query)
                         if len(skill_result) > 0:
                             skill_list.append({str(skill3).upper(): int(skill_result[0][0])})
@@ -463,7 +490,7 @@ class ExcelFileValidation:
                             row_list.append(None)
                             success_flag = False
                             remark += "Invalid Skill3, "
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[17]:
+                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[18]:
                     skill3_years = self.sheet_obj.cell(row=j, column=i).value
                     row_list.append(skill3_years)
                     if skill3_years is None or (type(skill3_years) != float and type(skill3_years) != int):
@@ -478,7 +505,7 @@ class ExcelFileValidation:
                 else:
                     success_flag = False
                     remark += "Given Skills does not match with required job skills"
-            row_list.append(remark.removesuffix(', '))
+            row_list.append(remark)
 
             if success_flag:
                 self.excel_success_row_list.append(row_list)
@@ -589,17 +616,21 @@ def thread_execution(row_id, path, job_id):
     logging.info(threading.current_thread().name)
     connection = create_server_connection()
 
-    query = f'''select SkillName, SkillId From jobskill where JobId = {job_id};'''
+    query = f'''select {TABLE_JOB_SKILL_SKILL_NAME}, {TABLE_JOB_SKILL_SKILL_ID} 
+    From {TABLE_JOB_SKILL_NAME} where {TABLE_JOB_SKILL_JOB_ID} = {job_id};'''
 
     job_skill_result = read_query(connection, query)
 
     job_skill_required = []
 
+    print(job_skill_result)
     if job_skill_result is not None and len(job_skill_result) > 0:
         for job_skill in job_skill_result:
             job_skill_required.append({str(job_skill[0]): int(job_skill[1])})
     else:
         logging.warning(f"Job Skills does not found for given Job ID: {job_id}")
+
+    print(job_skill_required)
 
     file_writing_flag = False
     if ".csv" in path:
@@ -664,6 +695,8 @@ def main():
             connection.close()
         except Exception as e:
             logging.exception(f"error in main method {e}")
+        print("Sleeping for 30 sec")
+        logging.info("Sleeping for 30 sec")
         time.sleep(30)
 
 
