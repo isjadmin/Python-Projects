@@ -53,6 +53,7 @@ CANDIDATE_SKILL_TABLE_CANDIDATE_ID = "CandidateId"
 CANDIDATE_SKILL_TABLE_SKILL_ID = "SkillId"
 CANDIDATE_SKILL_TABLE_EXPERIENCE = "Experience"
 CANDIDATE_SKILL_TABLE_ID = "Id"
+CANDIDATE_SKILL_TABLE_LAST_UPDATED_TIME = "LastUpdatedTime"
 
 CANDIDATE_JOB_SKILL_TABLE_NAME = "candidatejobskill"
 CANDIDATE_JOB_SKILL_TABLE_ID = "Id"
@@ -473,6 +474,9 @@ def candidate_skill_table_update(candidate_skills, job_id):
         id_result = read_query(connection, id_query)
 
         if id_result is not None and len(id_result) > 0:
+            time_now = datetime.now()
+            time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
+
             for i in range(0, 5, 2):
                 skill_check_query = f'''select {CANDIDATE_SKILL_TABLE_ID} from {CANDIDATE_SKILL_TABLE_NAME} 
                 where {CANDIDATE_SKILL_TABLE_CANDIDATE_ID} = {int(id_result[0][0])} and 
@@ -485,16 +489,17 @@ def candidate_skill_table_update(candidate_skills, job_id):
                     already present for candidate id {int(id_result[0][0])}")
 
                     skill_update_query = f'''UPDATE `{CANDIDATE_SKILL_TABLE_NAME}` 
-                    SET `{CANDIDATE_SKILL_TABLE_EXPERIENCE}` = {candidate_skill[i+3]}
-                    WHERE ({CANDIDATE_JOB_SKILL_TABLE_ID} = {int(skill_check_result[0][0])});'''
+                    SET `{CANDIDATE_SKILL_TABLE_EXPERIENCE}` = {candidate_skill[i+3]},
+                    `{CANDIDATE_SKILL_TABLE_LAST_UPDATED_TIME}` = '{time_now}'
+                    WHERE ({CANDIDATE_SKILL_TABLE_ID} = {int(skill_check_result[0][0])});'''
 
                     skill_update_flag = execute_query(connection, skill_update_query)
 
                 else:
                     skill_insert_query = f'''INSERT INTO {CANDIDATE_SKILL_TABLE_NAME} 
                     (`{CANDIDATE_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_SKILL_TABLE_SKILL_ID}`, 
-                    `{CANDIDATE_SKILL_TABLE_EXPERIENCE}`) 
-                    VALUES ({int(id_result[0][0])}, {candidate_skill[i+2]}, {candidate_skill[i+3]});'''
+                    `{CANDIDATE_SKILL_TABLE_EXPERIENCE}`, `{CANDIDATE_SKILL_TABLE_LAST_UPDATED_TIME}`) 
+                    VALUES ({int(id_result[0][0])}, {candidate_skill[i+2]}, {candidate_skill[i+3]}, '{time_now}');'''
 
                     execution_flag = execute_query(connection, skill_insert_query)
 
@@ -503,9 +508,6 @@ def candidate_skill_table_update(candidate_skills, job_id):
                             `{CANDIDATE_JOB_SKILL_TABLE_JOB_ID}` = {job_id});'''
 
             cjs_check_result = read_query(connection, cjs_check_query)
-
-            time_now = datetime.now()
-            time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
 
             if cjs_check_result is not None and len(cjs_check_result) > 0:
                 logging.info(f"job id {job_id} already present for candidate id {int(id_result[0][0])}")
