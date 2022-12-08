@@ -607,7 +607,7 @@ def main():
 
             query = f'''
             select {TABLE_COLUMN_ID}, {TABLE_COLUMN_PATH}, {TABLE_COLUMN_JOB_ID} From {TABLE_NAME} 
-            where {TABLE_COLUMN_PROCESS_STATE} = 1;
+            where {TABLE_COLUMN_PROCESS_STATE} = '1';
             '''
 
             query_results = read_query(connection, query)
