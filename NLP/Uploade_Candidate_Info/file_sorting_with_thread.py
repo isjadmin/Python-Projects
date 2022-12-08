@@ -23,11 +23,11 @@ PASSWORD = ""
 DB_NAME = ""
 
 TABLE_NAME = "upload"
-TABLE_COLUMN_ID = "id"
-TABLE_COLUMN_PATH = "path"
-TABLE_COLUMN_PROCESS_STATE = "processed_state"
-TABLE_COLUMN_FILE_UPDATE_TIME = "file_update_time"
-TABLE_COLUMN_JOB_ID = "job_id"
+TABLE_COLUMN_ID = "Id"
+TABLE_COLUMN_PATH = "Path"
+TABLE_COLUMN_PROCESS_STATE = "ProcessedState"
+TABLE_COLUMN_FILE_UPDATE_TIME = "FileUpdateTime"
+TABLE_COLUMN_JOB_ID = "JobId"
 
 TABLE_JOB_SKILL_NAME = "jobskill"
 TABLE_JOB_SKILL_JOB_ID = "JobId"
@@ -762,7 +762,7 @@ def thread_execution(row_id, path, job_id):
             file_writing_flag = excel_obj.excel_file_writing()
         else:
             query = f'''UPDATE {TABLE_NAME}
-                    SET {TABLE_COLUMN_PROCESS_STATE} = -1
+                    SET {TABLE_COLUMN_PROCESS_STATE} = '-1'
                     WHERE {TABLE_COLUMN_ID} = '{row_id}';
                     '''
             execute_query(connection, query)
@@ -772,7 +772,7 @@ def thread_execution(row_id, path, job_id):
         time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
         if file_writing_flag:
             query = f'''UPDATE {TABLE_NAME}
-                        SET {TABLE_COLUMN_PROCESS_STATE} = 1
+                        SET {TABLE_COLUMN_PROCESS_STATE} = '1'
                         WHERE {TABLE_COLUMN_ID} = '{row_id}';
                         '''
             execute_query(connection, query)

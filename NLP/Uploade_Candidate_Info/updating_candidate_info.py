@@ -24,10 +24,10 @@ DB_NAME = ""
 RESUME_DIRECTORY_PATH = ""
 
 TABLE_NAME = "upload"
-TABLE_COLUMN_ID = "id"
-TABLE_COLUMN_PATH = "path"
-TABLE_COLUMN_PROCESS_STATE = "processed_state"
-TABLE_COLUMN_JOB_ID = "job_id"
+TABLE_COLUMN_ID = "Id"
+TABLE_COLUMN_PATH = "Path"
+TABLE_COLUMN_PROCESS_STATE = "ProcessedState"
+TABLE_COLUMN_JOB_ID = "JobId"
 
 CANDIDATE_TABLE_NAME = "candidate"
 CANDIDATE_TABLE_FIRST_NAME = "FirstName"
@@ -638,7 +638,7 @@ def main():
                             candidate_skill_table_update(candidate_skill_id, job_id)
                             resume_download(resume_link_list)
                             query = f'''UPDATE {TABLE_NAME}
-                                        SET {TABLE_COLUMN_PROCESS_STATE} = 2
+                                        SET {TABLE_COLUMN_PROCESS_STATE} = '2'
                                         WHERE {TABLE_COLUMN_ID} = '{row_id}';'''
                             execute_query(connection, query)
             else:
