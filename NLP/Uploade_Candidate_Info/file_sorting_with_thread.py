@@ -138,12 +138,44 @@ class CsvFileValidation:
                         if str(type(date_time)) == "<class 'datetime.datetime'>":
                             pass
                         else:
+                            print("in else")
                             csv_success_flag = False
                             remark += "Invalid Created Date, "
                     except Exception as e:
                         logging.exception(f"{e}")
-                        csv_success_flag = False
-                        remark += "Invalid Created Date, "
+                        try:
+                            date_time = datetime.strptime(col, '%d-%m-%Y %H:%M:%S')
+                            if str(type(date_time)) == "<class 'datetime.datetime'>":
+                                pass
+                            else:
+                                print("in else")
+                                csv_success_flag = False
+                                remark += "Invalid Created Date, "
+                        except Exception as e:
+                            logging.exception(f"{e}")
+                            try:
+                                date_time = datetime.strptime(col, '%d-%b-%Y %H:%M')
+                                if str(type(date_time)) == "<class 'datetime.datetime'>":
+                                    pass
+                                else:
+                                    print("in else")
+                                    csv_success_flag = False
+                                    remark += "Invalid Created Date, "
+                            except Exception as e:
+                                logging.exception(f"{e}")
+                                try:
+                                    date_time = datetime.strptime(col, '%d-%m-%Y %H:%M')
+                                    if str(type(date_time)) == "<class 'datetime.datetime'>":
+                                        pass
+                                    else:
+                                        print("in else")
+                                        csv_success_flag = False
+                                        remark += "Invalid Created Date, "
+                                except Exception as e:
+                                    print("In exception")
+                                    logging.exception(f"{e}")
+                                    csv_success_flag = False
+                                    remark += "Invalid Created Date, "
                 if self.fields[count] == FIELD_NAMES[5]:
                     try:
                         if '.' in col:
