@@ -133,8 +133,25 @@ class CsvFileValidation:
                 if self.fields[count] == FIELD_NAMES[4]:  # Created time
                     if len(col) > 0:
                         created_time = col
-                        created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M:%S')
+                        try:
+                            created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M:%S')
+                        except Exception as e:
+                            logging.exception(f"{e}")
+                            try:
+                                created_time = datetime.strptime(created_time, '%d-%m-%Y %H:%M:%S')
+                            except Exception as e:
+                                logging.exception(f"{e}")
+                                try:
+                                    created_time = datetime.strptime(created_time, '%d-%m-%Y %H:%M')
+                                except Exception as e:
+                                    logging.exception(f"{e}")
+                                    try:
+                                        created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M')
+                                    except Exception as e:
+                                        logging.exception(f"{e}")
                         candidate_detail_list.append(created_time)
+                        print(created_time)
+                        print(type(created_time))
                     else:
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[5]:  # Test Score
@@ -574,13 +591,13 @@ def resume_download(resume_link_list):
             resume_path = current_resume_directory + "/"
             f = ""
             try:
-                f = gdown.download(url, quiet=False, fuzzy=True, output=resume_path)
+                url_list = url.split('/')
+                # same as the above, but with the file ID
+                download_file_id = url_list[5]
+                f = gdown.download(id=download_file_id, quiet=False, output=resume_path)
             except Exception as e:
                 try:
-                    url_list = url.split('/')
-                    # same as the above, but with the file ID
-                    download_file_id = url_list[5]
-                    f = gdown.download(id=download_file_id, quiet=False, output=resume_path)
+                    f = gdown.download(url, quiet=False, fuzzy=True, output=resume_path)
                 except Exception as e:
                     logging.exception(f"cannot download the resume for candidate-id {candidate_id}: {e}")
             if f is not None:
