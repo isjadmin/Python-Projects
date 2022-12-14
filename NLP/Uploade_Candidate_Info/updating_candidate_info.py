@@ -321,37 +321,37 @@ class ExcelFileValidation:
                         candidate_detail_list.append(expected_ctc)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[11]:
                     skill1_id = self.sheet_obj.cell(row=j, column=i).value
-                    if skill1_id is None or len(skill1_id) == 0:
+                    if skill1_id is None or  type(skill1_id) != int:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill1_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[12]:
                     skill1_year = self.sheet_obj.cell(row=j, column=i).value
-                    if skill1_year is None or len(skill1_year) == 0:
+                    if skill1_year is None or (type(skill1_year) != float and type(skill1_year) != int):
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill1_year)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[14]:
                     skill2_id = self.sheet_obj.cell(row=j, column=i).value
-                    if skill2_id is None or len(skill2_id) == 0:
+                    if skill2_id is None or type(skill2_id) != int:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill2_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[15]:
                     skill2_year = self.sheet_obj.cell(row=j, column=i).value
-                    if skill2_year is None or len(skill2_year) == 0:
+                    if skill2_year is None or (type(skill2_year) != float and type(skill2_year) != int):
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill2_year)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[17]:
                     skill3_id = self.sheet_obj.cell(row=j, column=i).value
-                    if skill3_id is None or len(skill3_id) == 0:
+                    if skill3_id is None or type(skill3_id) != int:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill3_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[18]:
                     skill3_year = self.sheet_obj.cell(row=j, column=i).value
-                    if skill3_year is None or len(skill3_year) == 0:
+                    if skill3_year is None or (type(skill3_year) != float and type(skill3_year) != int) == 0:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill3_year)
