@@ -321,37 +321,37 @@ class ExcelFileValidation:
                         candidate_detail_list.append(expected_ctc)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[11]:
                     skill1_id = self.sheet_obj.cell(row=j, column=i).value
-                    if skill1_id is None:
+                    if skill1_id is None or len(skill1_id) == 0:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill1_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[12]:
                     skill1_year = self.sheet_obj.cell(row=j, column=i).value
-                    if skill1_year is None:
+                    if skill1_year is None or len(skill1_year) == 0:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill1_year)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[14]:
                     skill2_id = self.sheet_obj.cell(row=j, column=i).value
-                    if skill2_id is None:
+                    if skill2_id is None or len(skill2_id) == 0:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill2_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[15]:
                     skill2_year = self.sheet_obj.cell(row=j, column=i).value
-                    if skill2_year is None:
+                    if skill2_year is None or len(skill2_year) == 0:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill2_year)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[17]:
                     skill3_id = self.sheet_obj.cell(row=j, column=i).value
-                    if skill3_id is None:
+                    if skill3_id is None or len(skill3_id) == 0:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill3_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[18]:
                     skill3_year = self.sheet_obj.cell(row=j, column=i).value
-                    if skill3_year is None:
+                    if skill3_year is None or len(skill3_year) == 0:
                         skill_id_list.append('0')
                     else:
                         skill_id_list.append(skill3_year)
@@ -594,7 +594,7 @@ def resume_download(resume_link_list):
                 url_list = url.split('/')
                 # same as the above, but with the file ID
                 download_file_id = url_list[5]
-                f = gdown.download(id=download_file_id, quiet=False, output=resume_path)
+                f = gdown.download(id=download_file_id, quiet=False, fuzzy=True, output=resume_path)
             except Exception as e:
                 try:
                     f = gdown.download(url, quiet=False, fuzzy=True, output=resume_path)
