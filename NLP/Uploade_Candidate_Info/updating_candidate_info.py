@@ -134,6 +134,10 @@ class CsvFileValidation:
                     if len(col) > 0:
                         created_time = col
                         try:
+                            created_time = created_time.replace("  ", " ")
+                        except Exception as e:
+                            pass
+                        try:
                             created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M:%S')
                         except Exception as e:
                             logging.exception(f"{e}")
