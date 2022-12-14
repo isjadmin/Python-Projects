@@ -490,8 +490,6 @@ def candidate_skill_table_update(candidate_skills, job_id):
     execution_flag = False
     connection = create_server_connection()
     for candidate_skill in candidate_skills:
-        if candidate_skill[0] == '0':
-            continue
         id_query = f'''select {CANDIDATE_TABLE_COLUMN_ID} From {CANDIDATE_TABLE_NAME} 
         where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {candidate_skill[0]}'''
         id_result = read_query(connection, id_query)
@@ -501,6 +499,8 @@ def candidate_skill_table_update(candidate_skills, job_id):
             time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
 
             for i in range(0, 5, 2):
+                if candidate_skill[i+2] == '0':
+                    continue
                 skill_check_query = f'''select {CANDIDATE_SKILL_TABLE_ID} from {CANDIDATE_SKILL_TABLE_NAME} 
                 where {CANDIDATE_SKILL_TABLE_CANDIDATE_ID} = {int(id_result[0][0])} and 
                 {CANDIDATE_SKILL_TABLE_SKILL_ID} = {candidate_skill[i+2]}'''
