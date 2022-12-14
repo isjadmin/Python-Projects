@@ -490,6 +490,8 @@ def candidate_skill_table_update(candidate_skills, job_id):
     execution_flag = False
     connection = create_server_connection()
     for candidate_skill in candidate_skills:
+        if candidate_skill[0] == '0':
+            continue
         id_query = f'''select {CANDIDATE_TABLE_COLUMN_ID} From {CANDIDATE_TABLE_NAME} 
         where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {candidate_skill[0]}'''
         id_result = read_query(connection, id_query)
