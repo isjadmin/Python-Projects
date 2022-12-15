@@ -6,7 +6,6 @@ import logging
 import json
 from datetime import datetime
 import time
-import gdown
 import os
 
 
@@ -584,38 +583,11 @@ def resume_download(resume_link_list):
                 logging.warning(f"resume link not available for candidate id: {candidate_id}")
                 continue
             url = link_detail[1]
-            current_resume_directory = RESUME_DIRECTORY_PATH + "/" + str(candidate_id)
-            if os.path.isdir(current_resume_directory):
-                pass
-            else:
-                try:
-                    os.mkdir(current_resume_directory)
-                except Exception as e:
-                    logging.exception(f"Error creating parent directory {RESUME_DIRECTORY_PATH}: {e}")
-                    continue
 
-            resume_path = current_resume_directory + "/"
-            f = ""
-            try:
-                url_list = url.split('/')
-                # same as the above, but with the file ID
-                download_file_id = url_list[5]
-                f = gdown.download(id=download_file_id, quiet=False, fuzzy=True, output=resume_path)
-            except Exception as e:
-                try:
-                    f = gdown.download(url, quiet=False, fuzzy=True, output=resume_path)
-                except Exception as e:
-                    logging.exception(f"cannot download the resume for candidate-id {candidate_id}: {e}")
-            if f is not None:
-                # f = f.replace("\\", "\\\\")
-                # f_list = f.split("\\\\")
-                f_list = f.split("/")
-                update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_RESUME_PATH}` = '{f}', 
-                                `{CANDIDATE_TABLE_COLUMN_RESUME_NAME}` = '{f_list[-1]}', 
-                                `{CANDIDATE_TABLE_COLUMN_RESUME_TYPE}` = '{str(f_list[-1]).split(".")[-1]}'
-                                WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {candidate_id});'''
+            update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_RESUME_PATH}` = '{url}'
+                            WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {candidate_id});'''
 
-                update_query_flag = execute_query(connection, update_query)
+            update_query_flag = execute_query(connection, update_query)
 
         else:
             logging.warning(f"Candidate id not found against mob no. {link_detail[0]}")

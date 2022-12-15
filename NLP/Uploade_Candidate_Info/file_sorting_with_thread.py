@@ -28,6 +28,10 @@ TABLE_COLUMN_PATH = "Path"
 TABLE_COLUMN_PROCESS_STATE = "ProcessedState"
 TABLE_COLUMN_FILE_UPDATE_TIME = "FileUpdateTime"
 TABLE_COLUMN_JOB_ID = "JobId"
+TABLE_COLUMN_SUCCESS_FILE_PATH = "SuccessPath"
+TABLE_COLUMN_ERROR_FILE_PATH = "FailurePath"
+TABLE_COLUMN_SUCCESS_FILE_ROWS = "SuccessCount"
+TABLE_COLUMN_ERROR_FILE_ROWS = "FailureCount"
 
 TABLE_JOB_SKILL_NAME = "jobskill"
 TABLE_JOB_SKILL_JOB_ID = "JobId"
@@ -72,6 +76,7 @@ class CsvFileValidation:
 
                 # get total number of rows
                 logging.info("Total no. of rows: %d" % csvreader.line_num)
+                print("Total no. of rows: %d" % csvreader.line_num)
         except Exception as e:
             logging.exception(f"Error Reading {self.path} file {e}")
 
@@ -381,6 +386,7 @@ class CsvFileValidation:
 
     # writing to csv file+
     def csv_file_writing(self):
+        file_details = {}
         try:
             for i in range(0, 2):
                 if i == 0:
@@ -398,11 +404,23 @@ class CsvFileValidation:
 
                     # writing the data rows
                     csvwriter.writerows(row_list)
-            logging.info(f"Files Written Successfully")
-            return True
+                logging.info(f"{file_name} Written Successfully")
+
+                with open(file_name, 'r') as csvfile:
+                    # creating a csv reader object
+                    csvreader = csv.reader(csvfile)
+
+                    row_count = 0
+                    for row in csvreader:
+                        row_count += 1
+
+                    row_count = row_count/2
+                    file_details[file_name] = int(row_count) - 1
+
+            return True, file_details
         except Exception as e:
             logging.exception(f"Error writing file: {e}")
-            return False
+            return False, file_details
 ########################################################################################################################
 
 
@@ -666,6 +684,7 @@ class ExcelFileValidation:
         self.connection.close()
 
     def excel_file_writing(self):
+        file_details = {}
         try:
             for i in range(0, 2):
                 if i == 0:
@@ -694,11 +713,20 @@ class ExcelFileValidation:
                     sheet_success.append(tuple(rows))
 
                 wb_success.save(file_name)
-            logging.info("file Written Successfully")
-            return True
+                logging.info(f"{file_name} Written Successfully")
+
+                # To open the workbook
+                wb_obj = openpyxl.load_workbook(file_name)
+
+                sheet_obj = wb_obj.active
+
+                row = sheet_obj.max_row
+
+                file_details[file_name] = row-1
+            return True, file_details
         except Exception as e:
             logging.exception(f"Error in writing file: {e}")
-            return False
+            return False, file_details
 ########################################################################################################################
 
 
@@ -786,12 +814,13 @@ def thread_execution(row_id, path, job_id):
         print(job_skill_required)
 
         file_writing_flag = False
+        file_details = {}
         if ".csv" in path:
             csv_obj = CsvFileValidation(path, job_skill_required)
-            file_writing_flag = csv_obj.csv_file_writing()
+            file_writing_flag, file_details = csv_obj.csv_file_writing()
         elif ".xlsx" in path:
             excel_obj = ExcelFileValidation(path, job_skill_required)
-            file_writing_flag = excel_obj.excel_file_writing()
+            file_writing_flag, file_details = excel_obj.excel_file_writing()
         else:
             query = f'''UPDATE {TABLE_NAME}
                     SET {TABLE_COLUMN_PROCESS_STATE} = '-1'
@@ -802,6 +831,7 @@ def thread_execution(row_id, path, job_id):
 
         time_now = datetime.now()
         time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
+        print(file_details)
         if file_writing_flag:
             query = f'''UPDATE {TABLE_NAME}
                         SET {TABLE_COLUMN_PROCESS_STATE} = '1'
@@ -809,8 +839,35 @@ def thread_execution(row_id, path, job_id):
                         '''
             execute_query(connection, query)
 
+            success_file_path = ""
+            success_file_rows = 0
+            error_file_path = ""
+            error_file_rows = 0
+
+            for key in file_details:
+                if "Success" in key:
+                    success_file_path = key
+                    success_file_rows = file_details[key]
+                elif "Error" in key:
+                    error_file_path = key
+                    error_file_rows = file_details[key]
+                else:
+                    success_file_path = ""
+                    success_file_rows = 0
+                    error_file_path = ""
+                    error_file_rows = 0
+
+            print(success_file_path)
+            print(success_file_rows)
+            print(error_file_path)
+            print(error_file_rows)
+
             query = f'''UPDATE {TABLE_NAME}
-                        SET {TABLE_COLUMN_FILE_UPDATE_TIME} = '{time_now}'
+                        SET {TABLE_COLUMN_FILE_UPDATE_TIME} = '{time_now}',
+                        {TABLE_COLUMN_SUCCESS_FILE_PATH} = '{success_file_path}',
+                        {TABLE_COLUMN_ERROR_FILE_PATH} = '{error_file_path}',
+                        {TABLE_COLUMN_SUCCESS_FILE_ROWS} = {int(success_file_rows)},
+                        {TABLE_COLUMN_ERROR_FILE_ROWS} = {int(error_file_rows)}
                         WHERE {TABLE_COLUMN_ID} = '{row_id}';
                         '''
             execute_query(connection, query)

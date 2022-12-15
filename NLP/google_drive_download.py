@@ -146,3 +146,34 @@ def download_file(real_file_id):
 
 if __name__ == '__main__':
     download_file(real_file_id='1T0433HfRFYlfZaEoTBRazhREwuVcXh6H')'''
+
+
+########################################################################################################################
+# import gdown
+'''current_resume_directory = RESUME_DIRECTORY_PATH + "/" + str(candidate_id)
+            if os.path.isdir(current_resume_directory):
+                pass
+            else:
+                try:
+                    os.mkdir(current_resume_directory)
+                except Exception as e:
+                    logging.exception(f"Error creating parent directory {RESUME_DIRECTORY_PATH}: {e}")
+                    continue
+
+            resume_path = current_resume_directory + "/"
+            f = ""
+            try:
+                url_list = url.split('/')
+                # same as the above, but with the file ID
+                download_file_id = url_list[5]
+                f = gdown.download(id=download_file_id, quiet=False, fuzzy=True, output=resume_path)
+            except Exception as e:
+                try:
+                    f = gdown.download(url, quiet=False, fuzzy=True, output=resume_path)
+                except Exception as e:
+                    logging.exception(f"cannot download the resume for candidate-id {candidate_id}: {e}")
+            if f is not None:
+                # f = f.replace("\\", "\\\\")
+                # f_list = f.split("\\\\")
+                f_list = f.split("/")'''
+########################################################################################################################
