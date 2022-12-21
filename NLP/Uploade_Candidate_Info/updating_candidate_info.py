@@ -40,6 +40,10 @@ CANDIDATE_TABLE_COLUMN_EMAIL_ID = "EmailId"
 CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD = "NoticePeriod"
 CANDIDATE_TABLE_COLUMN_CREATED_TIME = "CreatedTime"
 CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME = "LastUpdatedTime"
+CANDIDATE_TABLE_COLUMN_EMAIL_VALIDATED = "EmailValidated"
+CANDIDATE_TABLE_COLUMN_MOBILE_VALIDATED = "MobileValidated"
+CANDIDATE_TABLE_COLUMN_INDEXED = "Indexed"
+CANDIDATE_TABLE_COLUMN_DISABLED = "Disabled"
 
 CANDIDATE_TABLE_COLUMN_RESUME_TYPE = "ResumeType"
 CANDIDATE_TABLE_COLUMN_RESUME_ID = "ResumeId"
@@ -63,6 +67,7 @@ CANDIDATE_JOB_SKILL_TABLE_CREATED_TIME = "CreatedTime"
 CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED = "CandidateIntrested"
 CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED = "EmployerIntrested"
 CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE = "TotalScore"
+CANDIDATE_JOB_SKILL_TABLE_STATE = "State"
 
 
 ########################################################################################################################
@@ -445,7 +450,9 @@ def update_candidate_table(candidate_details):
                 update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_CCTC}` = {detail[6]}, 
                 `{CANDIDATE_TABLE_COLUMN_ECTC}` = {detail[7]}, `{CANDIDATE_TABLE_FIRST_NAME}` = '{detail[0]}', 
                 `{CANDIDATE_TABLE_LAST_NAME}` = '{detail[1]}', `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}` = {detail[5]},
-                `{CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME}` = '{time_now}'
+                `{CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME}` = '{time_now}',
+                `{CANDIDATE_TABLE_COLUMN_EMAIL_VALIDATED}` = {1}, `{CANDIDATE_TABLE_COLUMN_MOBILE_VALIDATED}` = {1},
+                `{CANDIDATE_TABLE_COLUMN_DISABLED}` = {0}, `{CANDIDATE_TABLE_COLUMN_INDEXED}` = {0}
                 WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0][0]});'''
 
                 execution_flag = execute_query(connection, update_query)
@@ -466,9 +473,11 @@ def update_candidate_table(candidate_details):
                 `{CANDIDATE_TABLE_COLUMN_ECTC}`, `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}`, `{CANDIDATE_TABLE_FIRST_NAME}`, 
                 `{CANDIDATE_TABLE_LAST_NAME}`, `{CANDIDATE_TABLE_COLUMN_MOB_NO}`, `{CANDIDATE_TABLE_DISPLAY_NAME}`,
                 `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}`, `{CANDIDATE_TABLE_COLUMN_CREATED_TIME}`,
-                `{CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME}`) 
+                `{CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME}`, `{CANDIDATE_TABLE_COLUMN_EMAIL_VALIDATED}`,
+                `{CANDIDATE_TABLE_COLUMN_MOBILE_VALIDATED}`, `{CANDIDATE_TABLE_COLUMN_DISABLED}`, 
+                `{CANDIDATE_TABLE_COLUMN_INDEXED}`) 
                 VALUES ({detail[6]}, {detail[7]}, '{detail[3]}', '{detail[0]}', '{detail[1]}', {detail[2]}, 
-                '{display_name}', {detail[5]}, '{detail[4]}', '{time_now}');'''
+                '{display_name}', {detail[5]}, '{detail[4]}', '{time_now}', {1}, {1}, {0}, {0});'''
 
                 execution_flag = execute_query(connection, insert_query)
 
@@ -538,7 +547,8 @@ def candidate_skill_table_update(candidate_skills, job_id):
                                 SET `{CANDIDATE_JOB_SKILL_TABLE_LAST_UPDATED_TIME}` = '{time_now}',
                                 `{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED}` = {1},
                                 `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}` = {1},
-                                `{CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE}` = {candidate_skill[1]}
+                                `{CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE}` = {candidate_skill[1]},
+                                `{CANDIDATE_JOB_SKILL_TABLE_STATE}` = '{"Apply"}'
                                 WHERE (`{CANDIDATE_JOB_SKILL_TABLE_ID}` = {int(cjs_check_result[0][0])});'''
 
                 update_cjs_flag = execute_query(connection, update_cjs_query)
@@ -549,9 +559,9 @@ def candidate_skill_table_update(candidate_skills, job_id):
                                 `{CANDIDATE_JOB_SKILL_TABLE_CREATED_TIME}`, 
                                 `{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED}`,
                                 `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}`,
-                                `{CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE}`) 
+                                `{CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE}`, `{CANDIDATE_JOB_SKILL_TABLE_STATE}`) 
                                 VALUES ({int(id_result[0][0])}, {job_id}, '{time_now}', 
-                                {1}, {1}, {candidate_skill[1]});'''
+                                {1}, {1}, {candidate_skill[1]}, '{"Apply"}');'''
 
                 insert_cjs_flag = execute_query(connection, insert_cjs_query)
 
