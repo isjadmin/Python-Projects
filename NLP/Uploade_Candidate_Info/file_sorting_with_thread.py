@@ -414,7 +414,6 @@ class CsvFileValidation:
                     for row in csvreader:
                         row_count += 1
 
-                    row_count = row_count/2
                     file_details[file_name] = int(row_count) - 1
 
             return True, file_details
