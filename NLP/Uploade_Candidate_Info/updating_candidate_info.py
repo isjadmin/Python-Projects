@@ -109,113 +109,179 @@ class CsvFileValidation:
                 continue
             for col in row:
                 if self.fields[count] == FIELD_NAMES[0]:  # First Name
-                    if len(col) > 0:
-                        candidate_detail_list.append(col)
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            candidate_detail_list.append(col)
+                        else:
+                            candidate_detail_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading first name {e}")
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[1]:  # Last Name
-                    if len(col) > 0:
-                        candidate_detail_list.append(col)
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            candidate_detail_list.append(col)
+                        else:
+                            candidate_detail_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading last name {e}")
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[2]:  # Mob No
-                    if len(col) > 0:
-                        mob_no = col
-                        mob_no = "+91." + str(mob_no)
-                        candidate_detail_list.append(mob_no)
-                        skill_id_list.append(mob_no)
-                        resume_link_list.append(mob_no)
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            mob_no = col
+                            mob_no = "+91." + str(mob_no)
+                            candidate_detail_list.append(mob_no)
+                            skill_id_list.append(mob_no)
+                            resume_link_list.append(mob_no)
+                        else:
+                            candidate_detail_list.append('0')
+                            skill_id_list.append('0')
+                            resume_link_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Mobile Number {e}")
                         candidate_detail_list.append('0')
                         skill_id_list.append('0')
                         resume_link_list.append('0')
                 if self.fields[count] == FIELD_NAMES[3]:  # Email Id
-                    if len(col) > 0:
-                        candidate_detail_list.append(col)
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            candidate_detail_list.append(col)
+                        else:
+                            candidate_detail_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Email Id {e}")
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[4]:  # Created time
-                    if len(col) > 0:
-                        created_time = col
-                        try:
-                            created_time = created_time.replace("  ", " ")
-                        except Exception as e:
-                            pass
-                        try:
-                            created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M:%S')
-                        except Exception as e:
-                            logging.exception(f"{e}")
+                    try:
+                        if len(col) > 0 or col is not None:
+                            created_time = col
                             try:
-                                created_time = datetime.strptime(created_time, '%d-%m-%Y %H:%M:%S')
+                                created_time = created_time.replace("  ", " ")
+                            except Exception as e:
+                                pass
+                            try:
+                                created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M:%S')
                             except Exception as e:
                                 logging.exception(f"{e}")
                                 try:
-                                    created_time = datetime.strptime(created_time, '%d-%m-%Y %H:%M')
+                                    created_time = datetime.strptime(created_time, '%d-%m-%Y %H:%M:%S')
                                 except Exception as e:
                                     logging.exception(f"{e}")
                                     try:
-                                        created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M')
+                                        created_time = datetime.strptime(created_time, '%d-%m-%Y %H:%M')
                                     except Exception as e:
                                         logging.exception(f"{e}")
-                        candidate_detail_list.append(created_time)
-                        print(created_time)
-                        print(type(created_time))
-                    else:
+                                        try:
+                                            created_time = datetime.strptime(created_time, '%d-%b-%Y %H:%M')
+                                        except Exception as e:
+                                            logging.exception(f"{e}")
+                            candidate_detail_list.append(created_time)
+                            print(created_time)
+                            print(type(created_time))
+                        else:
+                            candidate_detail_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Created Date {e}")
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[5]:  # Test Score
-                    if len(col) > 0:
-                        skill_id_list.append(float(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            skill_id_list.append(float(col))
+                        else:
+                            skill_id_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Test Score {e}")
                         skill_id_list.append('0')
                 if self.fields[count] == FIELD_NAMES[7]:  # Notice Period
-                    if len(col) > 0:
-                        candidate_detail_list.append(float(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            candidate_detail_list.append(float(col))
+                        else:
+                            candidate_detail_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Notice Period {e}")
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[8]:  # Current CTC
-                    if len(col) > 0:
-                        candidate_detail_list.append(float(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            candidate_detail_list.append(float(col))
+                        else:
+                            candidate_detail_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Current CTC {e}")
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[9]:  # Expected CTC
-                    if len(col) > 0:
-                        candidate_detail_list.append(float(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            candidate_detail_list.append(float(col))
+                        else:
+                            candidate_detail_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Expected CTC {e}")
                         candidate_detail_list.append('0')
                 if self.fields[count] == FIELD_NAMES[11]:  # Skill1 ID
-                    if len(col) > 0:
-                        skill_id_list.append(int(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            skill_id_list.append(int(col))
+                        else:
+                            skill_id_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill1 ID {e}")
                         skill_id_list.append('0')
                 if self.fields[count] == FIELD_NAMES[12]:  # Skill1 Years
-                    if len(col) > 0:
-                        skill_id_list.append(float(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            skill_id_list.append(float(col))
+                        else:
+                            skill_id_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill1 Years {e}")
                         skill_id_list.append('0')
                 if self.fields[count] == FIELD_NAMES[14]:  # Skill2 ID
-                    if len(col) > 0:
-                        skill_id_list.append(int(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            skill_id_list.append(int(col))
+                        else:
+                            skill_id_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill2 ID {e}")
                         skill_id_list.append('0')
                 if self.fields[count] == FIELD_NAMES[15]:  # Skill2 Years
-                    if len(col) > 0:
-                        skill_id_list.append(float(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            skill_id_list.append(float(col))
+                        else:
+                            skill_id_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill2 Years {e}")
                         skill_id_list.append('0')
                 if self.fields[count] == FIELD_NAMES[17]:  # Skill3 ID
-                    if len(col) > 0:
-                        skill_id_list.append(int(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            skill_id_list.append(int(col))
+                        else:
+                            skill_id_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill3 ID {e}")
                         skill_id_list.append('0')
                 if self.fields[count] == FIELD_NAMES[18]:  # Skill3 Years
-                    if len(col) > 0:
-                        skill_id_list.append(float(col))
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            skill_id_list.append(float(col))
+                        else:
+                            skill_id_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill3 Years {e}")
                         skill_id_list.append('0')
                 if self.fields[count] == FIELD_NAMES[6]:  # Resume Link
-                    if len(col) > 0:
-                        resume_link_list.append(col)
-                    else:
+                    try:
+                        if len(col) > 0 or col is not None:
+                            resume_link_list.append(col)
+                        else:
+                            resume_link_list.append('0')
+                    except Exception as e:
+                        logging.exception(f"Error reading Resume Link {e}")
                         resume_link_list.append('0')
                 if count < len(self.fields) - 1:
                     count += 1
@@ -269,106 +335,173 @@ class ExcelFileValidation:
             resume_link_list = []
             for i in range(1, self.column + 1):
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[0]:
-                    name = self.sheet_obj.cell(row=j, column=i).value
-                    if name is None or type(name) != str:
+                    try:
+                        name = self.sheet_obj.cell(row=j, column=i).value
+                        if name is None or type(name) != str:
+                            candidate_detail_list.append('0')
+                        else:
+                            candidate_detail_list.append(name)
+                    except Exception as e:
+                        logging.exception(f"Error reading first name {e}")
                         candidate_detail_list.append('0')
-                    else:
-                        candidate_detail_list.append(name)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[1]:
-                    last_name = self.sheet_obj.cell(row=j, column=i).value
-                    if last_name is None or type(last_name) != str:
+                    try:
+                        last_name = self.sheet_obj.cell(row=j, column=i).value
+                        if last_name is None or type(last_name) != str:
+                            candidate_detail_list.append('0')
+                        else:
+                            candidate_detail_list.append(last_name)
+                    except Exception as e:
+                        logging.exception(f"Error reading last name {e}")
                         candidate_detail_list.append('0')
-                    else:
-                        candidate_detail_list.append(last_name)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[2]:
-                    mob_no = self.sheet_obj.cell(row=j, column=i).value
-                    if mob_no is None or type(mob_no) != int or len(str(mob_no)) < 10:
+                    try:
+                        mob_no = self.sheet_obj.cell(row=j, column=i).value
+                        if mob_no is None or type(mob_no) != int or len(str(mob_no)) < 10:
+                            candidate_detail_list.append('0')
+                            skill_id_list.append('0')
+                        else:
+                            mob_no = "+91." + str(mob_no)
+                            candidate_detail_list.append(mob_no)
+                            skill_id_list.append(mob_no)
+                            resume_link_list.append(mob_no)
+                    except Exception as e:
+                        logging.exception(f"Error reading Mobile Number {e}")
                         candidate_detail_list.append('0')
                         skill_id_list.append('0')
-                    else:
-                        mob_no = "+91." + str(mob_no)
-                        candidate_detail_list.append(mob_no)
-                        skill_id_list.append(mob_no)
-                        resume_link_list.append(mob_no)
+                        resume_link_list.append('0')
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[3]:
-                    email_id = self.sheet_obj.cell(row=j, column=i).value
-                    if email_id is None:
+                    try:
+                        email_id = self.sheet_obj.cell(row=j, column=i).value
+                        if email_id is None:
+                            candidate_detail_list.append('0')
+                        else:
+                            candidate_detail_list.append(email_id)
+                    except Exception as e:
+                        logging.exception(f"Error reading Email Id {e}")
                         candidate_detail_list.append('0')
-                    else:
-                        candidate_detail_list.append(email_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[4]:
-                    created_time = self.sheet_obj.cell(row=j, column=i).value
-                    if created_time is None:
+                    try:
+                        created_time = self.sheet_obj.cell(row=j, column=i).value
+                        if created_time is None:
+                            candidate_detail_list.append('0')
+                        else:
+                            created_time = created_time.strptime(str(created_time), '%Y-%m-%d %H:%M:%S')
+                            candidate_detail_list.append(created_time)
+                    except Exception as e:
+                        logging.exception(f"Error reading Created Date {e}")
                         candidate_detail_list.append('0')
-                    else:
-                        created_time = created_time.strptime(str(created_time), '%Y-%m-%d %H:%M:%S')
-                        candidate_detail_list.append(created_time)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[5]:
-                    test_score = self.sheet_obj.cell(row=j, column=i).value
-                    if test_score is None or (type(test_score) != float and type(test_score) != int):
+                    try:
+                        test_score = self.sheet_obj.cell(row=j, column=i).value
+                        if test_score is None or (type(test_score) != float and type(test_score) != int):
+                            skill_id_list.append('0')
+                        else:
+                            skill_id_list.append(test_score)
+                    except Exception as e:
+                        logging.exception(f"Error reading Test Score {e}")
                         skill_id_list.append('0')
-                    else:
-                        skill_id_list.append(test_score)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[7]:
-                    notice_period = self.sheet_obj.cell(row=j, column=i).value
-                    if notice_period is None or (type(notice_period) != float and type(notice_period) != int):
+                    try:
+                        notice_period = self.sheet_obj.cell(row=j, column=i).value
+                        if notice_period is None or (type(notice_period) != float and type(notice_period) != int):
+                            candidate_detail_list.append('0')
+                        else:
+                            candidate_detail_list.append(notice_period)
+                    except Exception as e:
+                        logging.exception(f"Error reading Notice Period {e}")
                         candidate_detail_list.append('0')
-                    else:
-                        candidate_detail_list.append(notice_period)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[8]:
-                    current_ctc = self.sheet_obj.cell(row=j, column=i).value
-                    if current_ctc is None or (type(current_ctc) != float and type(current_ctc) != int):
+                    try:
+                        current_ctc = self.sheet_obj.cell(row=j, column=i).value
+                        if current_ctc is None or (type(current_ctc) != float and type(current_ctc) != int):
+                            candidate_detail_list.append('0')
+                        else:
+                            candidate_detail_list.append(current_ctc)
+                    except Exception as e:
+                        logging.exception(f"Error reading Current CTC {e}")
                         candidate_detail_list.append('0')
-                    else:
-                        candidate_detail_list.append(current_ctc)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[9]:
-                    expected_ctc = self.sheet_obj.cell(row=j, column=i).value
-                    if expected_ctc is None or (type(expected_ctc) != float and type(expected_ctc) != int):
+                    try:
+                        expected_ctc = self.sheet_obj.cell(row=j, column=i).value
+                        if expected_ctc is None or (type(expected_ctc) != float and type(expected_ctc) != int):
+                            candidate_detail_list.append('0')
+                        else:
+                            candidate_detail_list.append(expected_ctc)
+                    except Exception as e:
+                        logging.exception(f"Error reading Expected CTC {e}")
                         candidate_detail_list.append('0')
-                    else:
-                        candidate_detail_list.append(expected_ctc)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[11]:
-                    skill1_id = self.sheet_obj.cell(row=j, column=i).value
-                    if skill1_id is None or  type(skill1_id) != int:
+                    try:
+                        skill1_id = self.sheet_obj.cell(row=j, column=i).value
+                        if skill1_id is None or  type(skill1_id) != int:
+                            skill_id_list.append('0')
+                        else:
+                            skill_id_list.append(skill1_id)
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill1 Id {e}")
                         skill_id_list.append('0')
-                    else:
-                        skill_id_list.append(skill1_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[12]:
-                    skill1_year = self.sheet_obj.cell(row=j, column=i).value
-                    if skill1_year is None or (type(skill1_year) != float and type(skill1_year) != int):
+                    try:
+                        skill1_year = self.sheet_obj.cell(row=j, column=i).value
+                        if skill1_year is None or (type(skill1_year) != float and type(skill1_year) != int):
+                            skill_id_list.append('0')
+                        else:
+                            skill_id_list.append(skill1_year)
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill1 Years {e}")
                         skill_id_list.append('0')
-                    else:
-                        skill_id_list.append(skill1_year)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[14]:
-                    skill2_id = self.sheet_obj.cell(row=j, column=i).value
-                    if skill2_id is None or type(skill2_id) != int:
+                    try:
+                        skill2_id = self.sheet_obj.cell(row=j, column=i).value
+                        if skill2_id is None or type(skill2_id) != int:
+                            skill_id_list.append('0')
+                        else:
+                            skill_id_list.append(skill2_id)
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill2 Id {e}")
                         skill_id_list.append('0')
-                    else:
-                        skill_id_list.append(skill2_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[15]:
-                    skill2_year = self.sheet_obj.cell(row=j, column=i).value
-                    if skill2_year is None or (type(skill2_year) != float and type(skill2_year) != int):
+                    try:
+                        skill2_year = self.sheet_obj.cell(row=j, column=i).value
+                        if skill2_year is None or (type(skill2_year) != float and type(skill2_year) != int):
+                            skill_id_list.append('0')
+                        else:
+                            skill_id_list.append(skill2_year)
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill2 Years {e}")
                         skill_id_list.append('0')
-                    else:
-                        skill_id_list.append(skill2_year)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[17]:
-                    skill3_id = self.sheet_obj.cell(row=j, column=i).value
-                    if skill3_id is None or type(skill3_id) != int:
+                    try:
+                        skill3_id = self.sheet_obj.cell(row=j, column=i).value
+                        if skill3_id is None or type(skill3_id) != int:
+                            skill_id_list.append('0')
+                        else:
+                            skill_id_list.append(skill3_id)
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill3 Id {e}")
                         skill_id_list.append('0')
-                    else:
-                        skill_id_list.append(skill3_id)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[18]:
-                    skill3_year = self.sheet_obj.cell(row=j, column=i).value
-                    if skill3_year is None or (type(skill3_year) != float and type(skill3_year) != int) == 0:
+                    try:
+                        skill3_year = self.sheet_obj.cell(row=j, column=i).value
+                        if skill3_year is None or (type(skill3_year) != float and type(skill3_year) != int) == 0:
+                            skill_id_list.append('0')
+                        else:
+                            skill_id_list.append(skill3_year)
+                    except Exception as e:
+                        logging.exception(f"Error reading Skill3 Years {e}")
                         skill_id_list.append('0')
-                    else:
-                        skill_id_list.append(skill3_year)
                 if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[6]:
-                    url = self.sheet_obj.cell(row=j, column=i).value
-                    if url is None:
-                        logging.warning("URL not given")
-                    else:
-                        resume_link_list.append(url)
+                    try:
+                        url = self.sheet_obj.cell(row=j, column=i).value
+                        if url is None:
+                            logging.warning("URL not given")
+                            resume_link_list.append('0')
+                        else:
+                            resume_link_list.append(url)
+                    except Exception as e:
+                        logging.exception(f"Error reading Resume Link {e}")
+                        resume_link_list.append('0')
 
             candidate_details.append(candidate_detail_list)
             candidate_skill_id.append(skill_id_list)
@@ -621,6 +754,7 @@ def main():
                 for result in query_results:
                     row_id = result[0]
                     path = str(result[1])
+                    print(f"Working on {path}")
                     job_id = int(result[2])
 
                     candidate_details = []
@@ -646,14 +780,22 @@ def main():
                                         SET {TABLE_COLUMN_PROCESS_STATE} = '2'
                                         WHERE {TABLE_COLUMN_ID} = '{row_id}';'''
                             execute_query(connection, query)
+                        else:
+                            logging.warning(f"Entries from {path} are not updated in the tables")
+                            print(f"Entries from {path} are not updated in the tables")
+
+                    print("Sleeping for 10 sec")
+                    logging.info("Sleeping for 10 sec")
+                    time.sleep(10)
             else:
                 logging.info("No new file to update")
+                print("No new file to update")
             connection.close()
         except Exception as e:
             logging.exception(f"error in main method {e}")
-        print("Sleeping for 30 sec")
-        logging.info("Sleeping for 30 sec")
-        time.sleep(30)
+        print("Sleeping for 15 sec")
+        logging.info("Sleeping for 15 sec")
+        time.sleep(15)
 
 
 if __name__ == "__main__":

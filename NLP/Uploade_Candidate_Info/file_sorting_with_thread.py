@@ -373,6 +373,10 @@ class CsvFileValidation:
                     logging.exception(f"Error validating skill ids with job skill ids {e}")
                     csv_success_flag = False
                     remark += "Given Skills does not match with required job skills"
+            else:
+                logging.warning(f"All the three given skills are invalid")
+                csv_success_flag = False
+                remark += "Given Skills does not match with required job skills"
 
             row.insert(11, skill1_id)
             row.insert(14, skill2_id)
