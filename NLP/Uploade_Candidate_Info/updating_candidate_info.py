@@ -7,6 +7,7 @@ import json
 from datetime import datetime
 import time
 import os
+import requests
 
 
 FIELD_NAMES = ['first name', 'last name', 'mob no', 'email', 'created time', 'test score', 'linked resume',
@@ -44,6 +45,7 @@ CANDIDATE_TABLE_COLUMN_EMAIL_VALIDATED = "EmailValidated"
 CANDIDATE_TABLE_COLUMN_MOBILE_VALIDATED = "MobileValidated"
 CANDIDATE_TABLE_COLUMN_INDEXED = "Indexed"
 CANDIDATE_TABLE_COLUMN_DISABLED = "Disabled"
+CANDIDATE_TABLE_COLUMN_PROFILE_STATUS = "ProfileStatus"
 
 CANDIDATE_TABLE_COLUMN_RESUME_TYPE = "ResumeType"
 CANDIDATE_TABLE_COLUMN_RESUME_ID = "ResumeId"
@@ -585,7 +587,8 @@ def update_candidate_table(candidate_details):
                 `{CANDIDATE_TABLE_LAST_NAME}` = '{detail[1]}', `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}` = {detail[5]},
                 `{CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME}` = '{time_now}',
                 `{CANDIDATE_TABLE_COLUMN_EMAIL_VALIDATED}` = {1}, `{CANDIDATE_TABLE_COLUMN_MOBILE_VALIDATED}` = {1},
-                `{CANDIDATE_TABLE_COLUMN_DISABLED}` = {0}, `{CANDIDATE_TABLE_COLUMN_INDEXED}` = {0}
+                `{CANDIDATE_TABLE_COLUMN_DISABLED}` = {0}, `{CANDIDATE_TABLE_COLUMN_INDEXED}` = {0},
+                `{CANDIDATE_TABLE_COLUMN_PROFILE_STATUS}` = {20}
                 WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0][0]});'''
 
                 execution_flag = execute_query(connection, update_query)
@@ -608,9 +611,9 @@ def update_candidate_table(candidate_details):
                 `{CANDIDATE_TABLE_COLUMN_NOTICE_PERIOD}`, `{CANDIDATE_TABLE_COLUMN_CREATED_TIME}`,
                 `{CANDIDATE_TABLE_COLUMN_LAST_UPDATED_TIME}`, `{CANDIDATE_TABLE_COLUMN_EMAIL_VALIDATED}`,
                 `{CANDIDATE_TABLE_COLUMN_MOBILE_VALIDATED}`, `{CANDIDATE_TABLE_COLUMN_DISABLED}`, 
-                `{CANDIDATE_TABLE_COLUMN_INDEXED}`) 
+                `{CANDIDATE_TABLE_COLUMN_INDEXED}`, `{CANDIDATE_TABLE_COLUMN_PROFILE_STATUS}`) 
                 VALUES ({detail[6]}, {detail[7]}, '{detail[3]}', '{detail[0]}', '{detail[1]}', {detail[2]}, 
-                '{display_name}', {detail[5]}, '{detail[4]}', '{time_now}', {1}, {1}, {0}, {0});'''
+                '{display_name}', {detail[5]}, '{detail[4]}', '{time_now}', {1}, {1}, {0}, {0}, {20});'''
 
                 execution_flag = execute_query(connection, insert_query)
 
@@ -704,37 +707,101 @@ def candidate_skill_table_update(candidate_skills, job_id):
 
 
 def resume_download(resume_link_list):
-    if os.path.isdir(RESUME_DIRECTORY_PATH):
-        pass
-    else:
-        try:
-            os.mkdir(RESUME_DIRECTORY_PATH)
-        except Exception as e:
-            logging.exception(f"Error creating parent directory {RESUME_DIRECTORY_PATH}: {e}")
-            return
     connection = create_server_connection()
-    for link_detail in resume_link_list:
-        print(link_detail)
-        query = f'''select {CANDIDATE_TABLE_COLUMN_ID} From {CANDIDATE_TABLE_NAME} 
-        where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {link_detail[0]}'''
-
-        detail_result = read_query(connection, query)
-
-        if detail_result is not None and len(detail_result) > 0:
-            candidate_id = detail_result[0][0]
-            if link_detail[1] == '0':
-                logging.warning(f"resume link not available for candidate id: {candidate_id}")
-                continue
-            url = link_detail[1]
-
-            update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_RESUME_PATH}` = '{url}'
-                            WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {candidate_id});'''
-
-            update_query_flag = execute_query(connection, update_query)
-
+    try:
+        if os.path.isdir(RESUME_DIRECTORY_PATH):
+            pass
         else:
-            logging.warning(f"Candidate id not found against mob no. {link_detail[0]}")
-    connection.close()
+            try:
+                os.mkdir(RESUME_DIRECTORY_PATH)
+            except Exception as e:
+                logging.exception(f"Error creating parent directory {RESUME_DIRECTORY_PATH}: {e}")
+                connection.close()
+                return
+
+        for link_detail in resume_link_list:
+            print(link_detail)
+            query = f'''select {CANDIDATE_TABLE_COLUMN_ID} From {CANDIDATE_TABLE_NAME} 
+            where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {link_detail[0]}'''
+
+            detail_result = read_query(connection, query)
+
+            if detail_result is not None and len(detail_result) > 0:
+                candidate_id = detail_result[0][0]
+                if link_detail[1] == '0':
+                    logging.warning(f"resume link not available for candidate id: {candidate_id}")
+                    continue
+
+                resume_directory_path = RESUME_DIRECTORY_PATH + str(candidate_id) + "/"
+                if os.path.isdir(resume_directory_path):
+                    pass
+                else:
+                    try:
+                        os.mkdir(resume_directory_path)
+                    except Exception as e:
+                        logging.exception(f"Error creating parent directory {resume_directory_path}: {e}")
+                        continue
+
+                resume_url = link_detail[1]
+
+                file_id = resume_url.split("/")[5]
+
+                URL = "https://docs.google.com/uc?export=download"
+
+                session = requests.Session()
+
+                response = session.get(URL, params={'id': file_id, 'confirm': 1}, stream=True)
+                token = get_confirm_token(response)
+
+                if token:
+                    params = {'id': file_id, 'confirm': token}
+                    response = session.get(URL, params=params, stream=True)
+                filename = response.headers['Content-Disposition'].split(';')[1]
+                filename = filename.split('\"')[1]
+
+                destination = resume_directory_path + filename
+
+                file_save_flag = save_response_content(response, destination)
+
+                if file_save_flag:
+                    update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET 
+                    `{CANDIDATE_TABLE_COLUMN_RESUME_PATH}` = '{destination}',
+                    `{CANDIDATE_TABLE_COLUMN_RESUME_NAME}` = '{filename}',
+                    `{CANDIDATE_TABLE_COLUMN_RESUME_TYPE}` = '{filename.split('.')[-1]}'
+                    WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {candidate_id});'''
+
+                    update_query_flag = execute_query(connection, update_query)
+                else:
+                    logging.warning(f"Resume file does not saved for candidate id {candidate_id}")
+
+            else:
+                logging.warning(f"Candidate id not found against mob no. {link_detail[0]}")
+        connection.close()
+    except Exception as e:
+        logging.exception(f"Error downloading resume {e}")
+        connection.close()
+
+
+def get_confirm_token(response):
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
+
+    return None
+
+
+def save_response_content(response, destination):
+    try:
+        chunk_size = 32768
+
+        with open(destination, "wb") as f:
+            for chunk in response.iter_content(chunk_size):
+                if chunk:  # filter out keep-alive new chunks
+                    f.write(chunk)
+        return True
+    except Exception as e:
+        logging.exception(f"Error saving resume file {e}")
+        return False
 
 
 def main():
