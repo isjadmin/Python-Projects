@@ -387,7 +387,7 @@ class ExcelFileValidation:
                     try:
                         created_time = self.sheet_obj.cell(row=j, column=i).value
                         if created_time is None:
-                            candidate_detail_list.append(datetime.strptime('0000-00-00 00:00:00', '%Y-%m-%d %H:%M:%S'))
+                            candidate_detail_list.append('0')
                         else:
                             created_time = created_time.strptime(str(created_time), '%Y-%m-%d %H:%M:%S')
                             candidate_detail_list.append(created_time)
