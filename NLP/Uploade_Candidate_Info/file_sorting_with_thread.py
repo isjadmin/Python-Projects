@@ -712,6 +712,7 @@ class ExcelFileValidation:
 
                 sheet_success = wb_success.active
 
+                logging.warning(row_list)
                 for rows in tuple(row_list):
                     sheet_success.append(tuple(rows))
 

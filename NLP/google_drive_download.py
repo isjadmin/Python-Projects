@@ -6,7 +6,7 @@
 
 ########################################################################################################################
 
-import requests
+'''import requests
 
 
 def download_file_from_google_drive(id, destination):
@@ -20,6 +20,8 @@ def download_file_from_google_drive(id, destination):
     if token:
         params = {'id': id, 'confirm': token}
         response = session.get(URL, params=params, stream=True)
+    print(response)
+    print(response.headers)
     filename = response.headers['Content-Disposition'].split(';')[1]
     filename = filename.split('\"')[1]
     destination = destination + filename
@@ -45,12 +47,14 @@ def save_response_content(response, destination):
 
 
 if __name__ == "__main__":
-    file_id = '1T0433HfRFYlfZaEoTBRazhREwuVcXh6H'
-    destination = r"D:\Python-Projects\NLP\File-validation\Resume\Try\\"
-    download_file_from_google_drive(file_id, destination)
+    share_link = "https://docs.google.com/document/d/1AjAZKg1wAxv-j2vVVKX_Yk4SjGjIYiEC/edit?usp=share_link&ouid=114816155871736504274&rtpof=true&sd=true"
+    file_id = share_link.split("/")[5]'''
+    # destination = "D:\Python-Projects\NLP\File-validation\Resume\Try"
+    # download_file_from_google_drive(file_id, destination)
+
 
 ########################################################################################################################
-''' import pickle
+import pickle
 import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -121,7 +125,9 @@ file_list = result_dict.get('files')
 
 # Print every file's name
 for file in file_list:
-    print(file['name'])'''
+    print(file['name'])
+
+########################################################################################################################
 
 
 '''import gdown
@@ -151,6 +157,8 @@ if f is not None:
     print(str(f_list[-1]).split(".")[-1])
     print(len(f))
     print(type(f))'''
+
+########################################################################################################################
 
 '''from __future__ import print_function
 

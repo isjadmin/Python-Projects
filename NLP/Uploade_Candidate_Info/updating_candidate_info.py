@@ -362,6 +362,7 @@ class ExcelFileValidation:
                         if mob_no is None or type(mob_no) != int or len(str(mob_no)) < 10:
                             candidate_detail_list.append('0')
                             skill_id_list.append('0')
+                            resume_link_list.append('0')
                         else:
                             mob_no = "+91." + str(mob_no)
                             candidate_detail_list.append(mob_no)
@@ -386,7 +387,7 @@ class ExcelFileValidation:
                     try:
                         created_time = self.sheet_obj.cell(row=j, column=i).value
                         if created_time is None:
-                            candidate_detail_list.append('0')
+                            candidate_detail_list.append(datetime.strptime('0000-00-00 00:00:00', '%Y-%m-%d %H:%M:%S'))
                         else:
                             created_time = created_time.strptime(str(created_time), '%Y-%m-%d %H:%M:%S')
                             candidate_detail_list.append(created_time)
