@@ -14,7 +14,8 @@ FIELD_NAMES = ['first name', 'last name', 'mob no', 'email', 'created time', 'te
                'notice period', 'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2',
                'skill2 ID', 'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']
 
-CONFIG_FILE_PATH = "config.json"
+CONFIG_FILE_PATH = "/home/ubuntu/Python-Projects/NLP/Uploade_Candidate_Info/config.json"
+# CONFIG_FILE_PATH = "config.json"
 
 HOST_NAME = ""
 USER_NAME = ""
@@ -59,6 +60,7 @@ CANDIDATE_SKILL_TABLE_SKILL_ID = "SkillId"
 CANDIDATE_SKILL_TABLE_EXPERIENCE = "Experience"
 CANDIDATE_SKILL_TABLE_ID = "Id"
 CANDIDATE_SKILL_TABLE_LAST_UPDATED_TIME = "LastUpdatedTime"
+CANDIDATE_SKILL_TABLE_RATING = "Rating"
 
 CANDIDATE_JOB_SKILL_TABLE_NAME = "candidatejobskill"
 CANDIDATE_JOB_SKILL_TABLE_ID = "Id"
@@ -331,12 +333,12 @@ class ExcelFileValidation:
         candidate_details = []
         candidate_skill_id = []
         resume_list = []
-        for j in range(2, self.row + 1):
+        for j in range(3, self.row + 1):
             candidate_detail_list = []
             skill_id_list = []
             resume_link_list = []
             for i in range(1, self.column + 1):
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[0]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[0]:
                     try:
                         name = self.sheet_obj.cell(row=j, column=i).value
                         if name is None or type(name) != str:
@@ -346,7 +348,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading first name {e}")
                         candidate_detail_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[1]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[1]:
                     try:
                         last_name = self.sheet_obj.cell(row=j, column=i).value
                         if last_name is None or type(last_name) != str:
@@ -356,7 +358,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading last name {e}")
                         candidate_detail_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[2]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[2]:
                     try:
                         mob_no = self.sheet_obj.cell(row=j, column=i).value
                         if mob_no is None or type(mob_no) != int or len(str(mob_no)) < 10:
@@ -373,7 +375,7 @@ class ExcelFileValidation:
                         candidate_detail_list.append('0')
                         skill_id_list.append('0')
                         resume_link_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[3]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[3]:
                     try:
                         email_id = self.sheet_obj.cell(row=j, column=i).value
                         if email_id is None:
@@ -383,18 +385,19 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Email Id {e}")
                         candidate_detail_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[4]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[4]:
                     try:
                         created_time = self.sheet_obj.cell(row=j, column=i).value
                         if created_time is None:
                             candidate_detail_list.append('0')
                         else:
-                            created_time = created_time.strptime(str(created_time), '%Y-%m-%d %H:%M:%S')
+                            logging.warning(f"created_time = {created_time} \n created_time Type = {type(created_time)}")
+                            created_time = created_time.strptime(str(created_time), '%Y-%m-%d %H:%M:%S.%f')
                             candidate_detail_list.append(created_time)
                     except Exception as e:
                         logging.exception(f"Error reading Created Date {e}")
                         candidate_detail_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[5]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[5]:
                     try:
                         test_score = self.sheet_obj.cell(row=j, column=i).value
                         if test_score is None or (type(test_score) != float and type(test_score) != int):
@@ -404,7 +407,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Test Score {e}")
                         skill_id_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[7]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[7]:
                     try:
                         notice_period = self.sheet_obj.cell(row=j, column=i).value
                         if notice_period is None or (type(notice_period) != float and type(notice_period) != int):
@@ -414,7 +417,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Notice Period {e}")
                         candidate_detail_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[8]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[8]:
                     try:
                         current_ctc = self.sheet_obj.cell(row=j, column=i).value
                         if current_ctc is None or (type(current_ctc) != float and type(current_ctc) != int):
@@ -424,7 +427,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Current CTC {e}")
                         candidate_detail_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[9]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[9]:
                     try:
                         expected_ctc = self.sheet_obj.cell(row=j, column=i).value
                         if expected_ctc is None or (type(expected_ctc) != float and type(expected_ctc) != int):
@@ -434,7 +437,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Expected CTC {e}")
                         candidate_detail_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[11]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[11]:
                     try:
                         skill1_id = self.sheet_obj.cell(row=j, column=i).value
                         if skill1_id is None or  type(skill1_id) != int:
@@ -444,7 +447,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Skill1 Id {e}")
                         skill_id_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[12]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[12]:
                     try:
                         skill1_year = self.sheet_obj.cell(row=j, column=i).value
                         if skill1_year is None or (type(skill1_year) != float and type(skill1_year) != int):
@@ -454,7 +457,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Skill1 Years {e}")
                         skill_id_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[14]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[14]:
                     try:
                         skill2_id = self.sheet_obj.cell(row=j, column=i).value
                         if skill2_id is None or type(skill2_id) != int:
@@ -464,7 +467,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Skill2 Id {e}")
                         skill_id_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[15]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[15]:
                     try:
                         skill2_year = self.sheet_obj.cell(row=j, column=i).value
                         if skill2_year is None or (type(skill2_year) != float and type(skill2_year) != int):
@@ -474,7 +477,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Skill2 Years {e}")
                         skill_id_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[17]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[17]:
                     try:
                         skill3_id = self.sheet_obj.cell(row=j, column=i).value
                         if skill3_id is None or type(skill3_id) != int:
@@ -484,7 +487,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Skill3 Id {e}")
                         skill_id_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[18]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[18]:
                     try:
                         skill3_year = self.sheet_obj.cell(row=j, column=i).value
                         if skill3_year is None or (type(skill3_year) != float and type(skill3_year) != int) == 0:
@@ -494,7 +497,7 @@ class ExcelFileValidation:
                     except Exception as e:
                         logging.exception(f"Error reading Skill3 Years {e}")
                         skill_id_list.append('0')
-                if self.sheet_obj.cell(row=1, column=i).value == FIELD_NAMES[6]:
+                if self.sheet_obj.cell(row=2, column=i).value == FIELD_NAMES[6]:
                     try:
                         url = self.sheet_obj.cell(row=j, column=i).value
                         if url is None:
@@ -572,8 +575,10 @@ def read_query(connect, query):
 def update_candidate_table(candidate_details):
     execution_flag = False
     connection = create_server_connection()
+    logging.warning(candidate_details)
     try:
         for detail in candidate_details:
+            logging.warning(detail)
             query = f'''select {CANDIDATE_TABLE_COLUMN_ID}, {CANDIDATE_TABLE_COLUMN_EMAIL_ID} 
             From {CANDIDATE_TABLE_NAME} where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {detail[2]}'''
 
@@ -658,7 +663,8 @@ def candidate_skill_table_update(candidate_skills, job_id):
 
                     skill_update_query = f'''UPDATE `{CANDIDATE_SKILL_TABLE_NAME}` 
                     SET `{CANDIDATE_SKILL_TABLE_EXPERIENCE}` = {candidate_skill[i+3]},
-                    `{CANDIDATE_SKILL_TABLE_LAST_UPDATED_TIME}` = '{time_now}'
+                    `{CANDIDATE_SKILL_TABLE_LAST_UPDATED_TIME}` = '{time_now}',
+                    `{CANDIDATE_SKILL_TABLE_RATING}` = {0}
                     WHERE ({CANDIDATE_SKILL_TABLE_ID} = {int(skill_check_result[0][0])});'''
 
                     skill_update_flag = execute_query(connection, skill_update_query)
@@ -666,8 +672,10 @@ def candidate_skill_table_update(candidate_skills, job_id):
                 else:
                     skill_insert_query = f'''INSERT INTO {CANDIDATE_SKILL_TABLE_NAME} 
                     (`{CANDIDATE_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_SKILL_TABLE_SKILL_ID}`, 
-                    `{CANDIDATE_SKILL_TABLE_EXPERIENCE}`, `{CANDIDATE_SKILL_TABLE_LAST_UPDATED_TIME}`) 
-                    VALUES ({int(id_result[0][0])}, {candidate_skill[i+2]}, {candidate_skill[i+3]}, '{time_now}');'''
+                    `{CANDIDATE_SKILL_TABLE_EXPERIENCE}`, `{CANDIDATE_SKILL_TABLE_LAST_UPDATED_TIME}`,
+                    `{CANDIDATE_SKILL_TABLE_RATING}`) 
+                    VALUES ({int(id_result[0][0])}, {candidate_skill[i+2]}, {candidate_skill[i+3]}, '{time_now}'
+                    , {0});'''
 
                     execution_flag = execute_query(connection, skill_insert_query)
 
