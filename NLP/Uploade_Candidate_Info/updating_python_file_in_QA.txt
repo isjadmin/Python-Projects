@@ -1,0 +1,18 @@
+for updating python files
+
+1. Stop the service with command:
+	sudo service file_sorting_service stop
+	sudo service update_candidate_info_service stop
+
+2. pull the latest code in following directory
+	/home/ubuntu/updated_python_files
+
+3. remove the current python file with
+	sudo rm {fileName}
+
+4. copy the file
+	sudo cp /home/ubuntu/updated_python_files/{fileName} /home/ubuntu/Python-Projects/NLP/Uploade_Candidate_Info/{fileName}
+
+5. Start the services
+	sudo service file_sorting_service start
+	sudo service update_candidate_info_service start
