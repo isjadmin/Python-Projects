@@ -74,6 +74,10 @@ CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED = "EmployerIntrested"
 CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE = "TotalScore"
 CANDIDATE_JOB_SKILL_TABLE_STATE = "State"
 
+JOB_TABLE_NAME = "jobs"
+JOB_TABLE_ID = "Id"
+JOB_TABLE_INDEX = "Indexed"
+
 
 ########################################################################################################################
 class CsvFileValidation:
@@ -865,6 +869,12 @@ def main():
                         if update_table_flag:
                             candidate_skill_table_update(candidate_skill_id, job_id)
                             resume_download(resume_link_list)
+
+                            query = f'''UPDATE {JOB_TABLE_NAME}
+                                        SET {JOB_TABLE_INDEX} = {0}
+                                        WHERE {JOB_TABLE_ID} = '{job_id}';'''
+                            execute_query(connection, query)
+
                             query = f'''UPDATE {TABLE_NAME}
                                         SET {TABLE_COLUMN_PROCESS_STATE} = '2'
                                         WHERE {TABLE_COLUMN_ID} = '{row_id}';'''
