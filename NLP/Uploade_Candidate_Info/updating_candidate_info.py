@@ -14,8 +14,8 @@ FIELD_NAMES = ['first name', 'last name', 'mob no', 'email', 'created time', 'te
                'notice period', 'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2',
                'skill2 ID', 'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']
 
-CONFIG_FILE_PATH = "/home/ubuntu/Python-Projects/NLP/Uploade_Candidate_Info/config.json"
-# CONFIG_FILE_PATH = "config.json"
+# CONFIG_FILE_PATH = "/home/ubuntu/Python-Projects/NLP/Uploade_Candidate_Info/config.json"
+CONFIG_FILE_PATH = "config.json"
 
 HOST_NAME = ""
 USER_NAME = ""
@@ -53,6 +53,7 @@ CANDIDATE_TABLE_COLUMN_RESUME_ID = "ResumeId"
 CANDIDATE_TABLE_COLUMN_RESUME_NAME = "ResumeName"
 CANDIDATE_TABLE_COLUMN_RESUME_PATH = "ResumePath"
 CANDIDATE_TABLE_COLUMN_RESUME_PARSED = "ResumeParsed"
+CANDIDATE_TABLE_COLUMN_RESUME_URL = "Url"
 
 CANDIDATE_SKILL_TABLE_NAME = "candidateskill"
 CANDIDATE_SKILL_TABLE_CANDIDATE_ID = "CandidateId"
@@ -579,13 +580,17 @@ def update_candidate_table(candidate_details):
     try:
         for detail in candidate_details:
             logging.warning(detail)
-            query = f'''select {CANDIDATE_TABLE_COLUMN_ID}, {CANDIDATE_TABLE_COLUMN_EMAIL_ID} 
+            query = f'''select {CANDIDATE_TABLE_COLUMN_ID}, {CANDIDATE_TABLE_COLUMN_EMAIL_ID}, 
+            {CANDIDATE_TABLE_DISPLAY_NAME} 
             From {CANDIDATE_TABLE_NAME} where {CANDIDATE_TABLE_COLUMN_MOB_NO} = {detail[2]}'''
 
             detail_result = read_query(connection, query)
 
             time_now = datetime.now()
             time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
+
+            milliseconds = int(time.time() * 1000)
+            display_name = detail[0] + detail[1] + str(milliseconds)
 
             if detail_result is not None and len(detail_result) > 0:
                 update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET `{CANDIDATE_TABLE_COLUMN_CCTC}` = {detail[6]}, 
@@ -607,9 +612,16 @@ def update_candidate_table(candidate_details):
 
                     email_update_flag = execute_query(connection, update_query)
 
+                print(f"Display Name : {detail_result[0][2]}")
+                display_name_flag = False
+                if detail_result[0][2] is None:
+                    update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET
+                    `{CANDIDATE_TABLE_DISPLAY_NAME}` = '{display_name}'
+                    WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {detail_result[0][0]});'''
+
+                    display_name_flag = execute_query(connection, update_query)
+
             else:
-                milliseconds = int(time.time() * 1000)
-                display_name = detail[0] + detail[1] + str(milliseconds)
                 detail[4] = detail[4].strftime('%Y-%m-%d %H:%M:%S')
                 insert_query = f'''INSERT INTO {CANDIDATE_TABLE_NAME} (`{CANDIDATE_TABLE_COLUMN_CCTC}`, 
                 `{CANDIDATE_TABLE_COLUMN_ECTC}`, `{CANDIDATE_TABLE_COLUMN_EMAIL_ID}`, `{CANDIDATE_TABLE_FIRST_NAME}`, 
@@ -776,7 +788,8 @@ def resume_download(resume_link_list):
                     update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET 
                     `{CANDIDATE_TABLE_COLUMN_RESUME_PATH}` = '{destination}',
                     `{CANDIDATE_TABLE_COLUMN_RESUME_NAME}` = '{filename}',
-                    `{CANDIDATE_TABLE_COLUMN_RESUME_TYPE}` = '{filename.split('.')[-1]}'
+                    `{CANDIDATE_TABLE_COLUMN_RESUME_TYPE}` = '{filename.split('.')[-1]}',
+                    `{CANDIDATE_TABLE_COLUMN_RESUME_URL}` = '{resume_url}'
                     WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {candidate_id});'''
 
                     update_query_flag = execute_query(connection, update_query)
