@@ -14,8 +14,8 @@ FIELD_NAMES = ['first name', 'last name', 'mob no', 'email', 'created time', 'te
                'notice period', 'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2',
                'skill2 ID', 'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']
 
-# CONFIG_FILE_PATH = "/home/ubuntu/Python-Projects/NLP/Uploade_Candidate_Info/config.json"
-CONFIG_FILE_PATH = "config.json"
+CONFIG_FILE_PATH = "/home/ubuntu/Python-Projects/NLP/Uploade_Candidate_Info/config.json"
+# CONFIG_FILE_PATH = "config.json"
 
 HOST_NAME = ""
 USER_NAME = ""
