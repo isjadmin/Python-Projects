@@ -719,10 +719,11 @@ def candidate_skill_table_update(candidate_skills, job_id):
                 insert_cjs_query = f'''INSERT INTO {CANDIDATE_JOB_SKILL_TABLE_NAME} 
                                 (`{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_ID}`, `{CANDIDATE_JOB_SKILL_TABLE_JOB_ID}`, 
                                 `{CANDIDATE_JOB_SKILL_TABLE_CREATED_TIME}`, 
+                                `{CANDIDATE_JOB_SKILL_TABLE_LAST_UPDATED_TIME}`
                                 `{CANDIDATE_JOB_SKILL_TABLE_CANDIDATE_INTERESTED}`,
                                 `{CANDIDATE_JOB_SKILL_TABLE_EMPLOYER_INTERESTED}`,
                                 `{CANDIDATE_JOB_SKILL_TABLE_TOTAL_SCORE}`, `{CANDIDATE_JOB_SKILL_TABLE_STATE}`) 
-                                VALUES ({int(id_result[0][0])}, {job_id}, '{time_now}', 
+                                VALUES ({int(id_result[0][0])}, {job_id}, '{time_now}', '{time_now}', 
                                 {1}, {1}, {candidate_skill[1]}, '{"Apply"}');'''
 
                 insert_cjs_flag = execute_query(connection, insert_cjs_query)
