@@ -14,8 +14,8 @@ FIELD_NAMES = ['first name', 'last name', 'mob no', 'email', 'created time', 'te
                'notice period', 'current ctc', 'expected ctc', 'skill1', 'skill1 ID', 'skill1 years', 'skill2',
                'skill2 ID', 'skill2 years', 'skill3', 'skill3 ID', 'skill3 years', 'remark']
 
-CONFIG_FILE_PATH = "/home/ubuntu/Python-Projects/NLP/Uploade_Candidate_Info/config.json"
-# CONFIG_FILE_PATH = "config.json"
+# CONFIG_FILE_PATH = "/home/ubuntu/Python-Projects/NLP/Uploade_Candidate_Info/config.json"
+CONFIG_FILE_PATH = "config.json"
 
 HOST_NAME = ""
 USER_NAME = ""
@@ -77,6 +77,7 @@ CANDIDATE_JOB_SKILL_TABLE_STATE = "State"
 JOB_TABLE_NAME = "jobs"
 JOB_TABLE_ID = "Id"
 JOB_TABLE_INDEX = "Indexed"
+JOB_TABLE_LAST_UPDATED_TIME = "LastUpdateTime"
 
 
 ########################################################################################################################
@@ -870,8 +871,12 @@ def main():
                             candidate_skill_table_update(candidate_skill_id, job_id)
                             resume_download(resume_link_list)
 
+                            time_now = datetime.now()
+                            time_now = time_now.strftime('%Y-%m-%d %H:%M:%S')
+
                             query = f'''UPDATE {JOB_TABLE_NAME}
-                                        SET {JOB_TABLE_INDEX} = {0}
+                                        SET {JOB_TABLE_INDEX} = {0},
+                                        {JOB_TABLE_LAST_UPDATED_TIME} = '{time_now}'
                                         WHERE {JOB_TABLE_ID} = '{job_id}';'''
                             execute_query(connection, query)
 
