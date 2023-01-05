@@ -758,6 +758,18 @@ def resume_download(resume_link_list):
                     logging.warning(f"resume link not available for candidate id: {candidate_id}")
                     continue
 
+                resume_url = link_detail[1]
+                update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET 
+                                `{CANDIDATE_TABLE_COLUMN_RESUME_URL}` = '{resume_url}'
+                                WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {candidate_id});'''
+
+                update_query_flag = execute_query(connection, update_query)
+
+                print(f"update flag: {update_query_flag}")
+
+                if not update_query_flag:
+                    logging.warning(f"Error Updating URL column of candidate table")
+
                 resume_directory_path = RESUME_DIRECTORY_PATH + str(candidate_id) + "/"
                 if os.path.isdir(resume_directory_path):
                     pass
@@ -767,8 +779,6 @@ def resume_download(resume_link_list):
                     except Exception as e:
                         logging.exception(f"Error creating parent directory {resume_directory_path}: {e}")
                         continue
-
-                resume_url = link_detail[1]
 
                 file_id = resume_url.split("/")[5]
 
@@ -793,8 +803,7 @@ def resume_download(resume_link_list):
                     update_query = f'''UPDATE {CANDIDATE_TABLE_NAME} SET 
                     `{CANDIDATE_TABLE_COLUMN_RESUME_PATH}` = '{destination}',
                     `{CANDIDATE_TABLE_COLUMN_RESUME_NAME}` = '{filename}',
-                    `{CANDIDATE_TABLE_COLUMN_RESUME_TYPE}` = '{filename.split('.')[-1]}',
-                    `{CANDIDATE_TABLE_COLUMN_RESUME_URL}` = '{resume_url}'
+                    `{CANDIDATE_TABLE_COLUMN_RESUME_TYPE}` = '{filename.split('.')[-1]}'
                     WHERE ({CANDIDATE_TABLE_COLUMN_ID} = {candidate_id});'''
 
                     update_query_flag = execute_query(connection, update_query)
